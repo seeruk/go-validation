@@ -32,12 +32,6 @@ type Context struct {
 	// TODO: Path.
 }
 
-type Struct []Constraint
-
-func (s Struct) Violations(ctx Context) []ConstraintViolation {
-	return nil
-}
-
 type Fields map[string]Constraint
 
 func (f Fields) Violations(ctx Context) []ConstraintViolation {
