@@ -8,7 +8,7 @@ func MutuallyExclusive(fields ...string) validation.ConstraintFunc {
 		var nonEmpty []string
 		for _, field := range fields {
 			f := ctx.Value.FieldByName(field)
-			if !f.IsZero() {
+			if !validation.IsEmpty(f) {
 				nonEmpty = append(nonEmpty, field)
 			}
 		}
