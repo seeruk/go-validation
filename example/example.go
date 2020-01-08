@@ -1,9 +1,14 @@
-package example
+package main
 
 import (
+	"github.com/davecgh/go-spew/spew"
 	"github.com/seeruk/go-validation"
 	"github.com/seeruk/go-validation/constraints"
 )
+
+func main() {
+	spew.Dump(validation.Validate(0, constraints.Required))
+}
 
 // Example ...
 type Example struct {
