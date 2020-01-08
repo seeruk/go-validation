@@ -17,8 +17,9 @@ func main() {
 
 // Example ...
 type Example struct {
-	Text   string `json:"text"`
-	Number int    `json:"number"`
+	Text   string                 `json:"text"`
+	Number int                    `json:"number"`
+	Object map[string]interface{} `json:"object"`
 }
 
 // exampleConstraints ...
@@ -45,8 +46,15 @@ func exampleConstraints() validation.Constraint {
 	fieldConstraints := validation.Fields{
 		"Text": validation.Constraints{
 			constraints.Required,
-			validation.Elements{constraints.Required},
-			validation.Keys{constraints.Required},
+		},
+		"Object": validation.Constraints{
+			constraints.Required,
+			validation.Elements{
+				constraints.Required,
+			},
+			validation.Keys{
+				constraints.Required,
+			},
 		},
 	}
 
