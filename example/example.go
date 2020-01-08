@@ -7,8 +7,12 @@ import (
 )
 
 func main() {
+	e := Example{}
+	e.Text = "Hello, World"
+	e.Number = 123
+
 	spew.Dump(validation.Validate(0, constraints.Required))
-	spew.Dump(validation.Validate(Example{Text: "Hello", Number: 123}, exampleConstraints()))
+	spew.Dump(validation.Validate(e, exampleConstraints()))
 }
 
 // Example ...
