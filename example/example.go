@@ -1,7 +1,10 @@
 package main
 
 import (
-	"github.com/davecgh/go-spew/spew"
+	"bytes"
+	"encoding/json"
+	"fmt"
+
 	"github.com/seeruk/go-validation"
 	"github.com/seeruk/go-validation/constraints"
 )
@@ -11,15 +14,27 @@ func main() {
 	e.Text = "Hello, World"
 	e.Number = 123
 
-	spew.Dump(validation.Validate(0, constraints.Required))
-	spew.Dump(validation.Validate(e, exampleConstraints()))
+	foo := "foo"
+
+	e.Object = map[*string]interface{}{
+		&foo:           (*int)(nil),
+		(*string)(nil): "bar",
+	}
+
+	var buf bytes.Buffer
+
+	encoder := json.NewEncoder(&buf)
+	encoder.SetIndent("", "  ")
+	encoder.Encode(validation.Validate(e, exampleConstraints()))
+
+	fmt.Println(buf.String())
 }
 
 // Example ...
 type Example struct {
-	Text   string                 `json:"text"`
-	Number int                    `json:"number"`
-	Object map[string]interface{} `json:"object"`
+	Text   string                  `json:"text"`
+	Number int                     `json:"number"`
+	Object map[*string]interface{} `json:"object"`
 }
 
 // exampleConstraints ...
@@ -43,6 +58,8 @@ func exampleConstraints() validation.Constraint {
 		constraints.MutuallyExclusive("Text", "Number"),
 	}
 
+	foo := "foo"
+
 	fieldConstraints := validation.Fields{
 		"Text": validation.Constraints{
 			constraints.Required,
@@ -54,6 +71,9 @@ func exampleConstraints() validation.Constraint {
 			},
 			validation.Keys{
 				constraints.Required,
+			},
+			validation.Map{
+				&foo: constraints.Required,
 			},
 		},
 	}
