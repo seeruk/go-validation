@@ -22,3 +22,13 @@ func IsEmpty(value reflect.Value) bool {
 
 	return false
 }
+
+// IsNillable returns true if the given value is of a nillable type.
+func IsNillable(value reflect.Value) bool {
+	switch value.Kind() {
+	case reflect.Array, reflect.Chan, reflect.Func, reflect.Interface, reflect.Map, reflect.Ptr, reflect.Slice, reflect.UnsafePointer:
+		return true
+	}
+
+	return false
+}

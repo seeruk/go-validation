@@ -1,17 +1,26 @@
 package constraints
 
-import "github.com/seeruk/go-validation"
+import (
+	"reflect"
+
+	"github.com/seeruk/go-validation"
+)
 
 // MutuallyExclusive ...
 func MutuallyExclusive(fields ...string) validation.ConstraintFunc {
 	return func(ctx validation.Context) []validation.ConstraintViolation {
-		rval := ctx.Value().Node
+		rval := validation.UnwrapValue(ctx.Value().Node)
+		validation.MustBe(validation.UnwrapType(rval.Type()), reflect.Struct)
+
+		if validation.IsNillable(rval) && rval.IsNil() {
+			return nil
+		}
 
 		var nonEmpty []string
 		for _, field := range fields {
 			f := rval.FieldByName(field)
 			if !validation.IsEmpty(f) {
-				nonEmpty = append(nonEmpty, field)
+				nonEmpty = append(nonEmpty, validation.FieldName(ctx, field))
 			}
 		}
 
