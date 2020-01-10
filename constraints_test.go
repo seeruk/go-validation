@@ -258,7 +258,93 @@ func TestElements(t *testing.T) {
 }
 
 func TestFields(t *testing.T) {
+	type fieldsTester struct {
+		Foo string
+		Bar int
+		Baz []string
+	}
 
+	t.Run("should run all constraints", func(t *testing.T) {
+		testConstraint := &TestConstraint{}
+
+		Validate(fieldsTester{}, Fields{
+			"Foo": testConstraint,
+			"Bar": testConstraint,
+			"Baz": testConstraint,
+		})
+
+		assert.Equal(t, 3, testConstraint.Calls)
+	})
+
+	t.Run("should return all constraint violations", func(t *testing.T) {
+		testConstraint := &TestConstraint{}
+
+		violations := Validate(fieldsTester{}, Fields{
+			"Foo": testConstraint,
+			"Bar": testConstraint,
+			"Baz": testConstraint,
+		})
+
+		assert.Len(t, violations, 3)
+	})
+
+	t.Run("should return no violations if the given value is nil", func(t *testing.T) {
+		testConstraint := &TestConstraint{}
+
+		violations := Validate((*fieldsTester)(nil), Fields{
+			"Foo": testConstraint,
+			"Bar": testConstraint,
+			"Baz": testConstraint,
+		})
+
+		assert.Len(t, violations, 0)
+	})
+
+	t.Run("should update the context's value node to the fields of the given value", func(t *testing.T) {
+		fieldsTester := fieldsTester{
+			Foo: "this is a test",
+			Bar: 123,
+			Baz: []string{"Hello, Go!"},
+		}
+
+		var foo string
+		var bar int
+		var baz []string
+
+		violations := Validate(fieldsTester, Fields{
+			"Foo": ConstraintFunc(func(ctx Context) []ConstraintViolation {
+				foo = ctx.Value().Node.Interface().(string)
+				return nil
+			}),
+			"Bar": ConstraintFunc(func(ctx Context) []ConstraintViolation {
+				bar = ctx.Value().Node.Interface().(int)
+				return nil
+			}),
+			"Baz": ConstraintFunc(func(ctx Context) []ConstraintViolation {
+				baz = ctx.Value().Node.Interface().([]string)
+				return nil
+			}),
+		})
+
+		require.Len(t, violations, 0)
+		assert.Equal(t, fieldsTester.Foo, foo)
+		assert.Equal(t, fieldsTester.Bar, bar)
+		assert.Equal(t, fieldsTester.Baz, baz)
+	})
+
+	t.Run("should update the path", func(t *testing.T) {
+		testConstraint := &TestConstraint{}
+		fieldsTester := fieldsTester{
+			Foo: "will fail",
+		}
+
+		violations := Validate(fieldsTester, Fields{
+			"Foo": testConstraint,
+		})
+
+		require.Len(t, violations, 1)
+		assert.Equal(t, ".Foo", violations[0].Path)
+	})
 }
 
 func TestKeys(t *testing.T) {
@@ -266,7 +352,22 @@ func TestKeys(t *testing.T) {
 }
 
 func TestLazy(t *testing.T) {
+	t.Run("should not execute the underlying constraint upon construction", func(t *testing.T) {
+		testConstraint := &TestConstraint{}
 
+		_ = Lazy(func() Constraint { return testConstraint })
+
+		assert.Equal(t, 0, testConstraint.Calls)
+	})
+
+	t.Run("should execute the constraint during validation", func(t *testing.T) {
+		testConstraint := &TestConstraint{}
+
+		violations := Validate(nil, Lazy(func() Constraint { return testConstraint }))
+
+		assert.Equal(t, 1, testConstraint.Calls)
+		assert.Len(t, violations, 1)
+	})
 }
 
 func TestMap(t *testing.T) {
@@ -274,11 +375,103 @@ func TestMap(t *testing.T) {
 }
 
 func TestWhen(t *testing.T) {
+	t.Run("should run all constraints when the predicate is true", func(t *testing.T) {
+		testConstraint := &TestConstraint{}
+		Validate(nil, When(true,
+			testConstraint,
+			testConstraint,
+			testConstraint,
+			testConstraint,
+		))
 
+		assert.Equal(t, 4, testConstraint.Calls)
+	})
+
+	t.Run("should return all constraint violations when the predicate is true", func(t *testing.T) {
+		testConstraint := &TestConstraint{}
+		violations := Validate(nil, When(true,
+			testConstraint,
+			testConstraint,
+			testConstraint,
+			testConstraint,
+		))
+
+		assert.Len(t, violations, 4)
+	})
+
+	t.Run("should not run any constraints when the predicate is false", func(t *testing.T) {
+		testConstraint := &TestConstraint{}
+		Validate(nil, When(false,
+			testConstraint,
+			testConstraint,
+			testConstraint,
+			testConstraint,
+		))
+
+		assert.Equal(t, 0, testConstraint.Calls)
+	})
+
+	t.Run("should not return any constraint violations when the predicate is false", func(t *testing.T) {
+		testConstraint := &TestConstraint{}
+		violations := Validate(nil, When(false,
+			testConstraint,
+			testConstraint,
+			testConstraint,
+			testConstraint,
+		))
+
+		assert.Len(t, violations, 0)
+	})
 }
 
 func TestWhenFn(t *testing.T) {
+	t.Run("should run all constraints when the predicate function returns true", func(t *testing.T) {
+		testConstraint := &TestConstraint{}
+		Validate(nil, WhenFn(func() bool { return true },
+			testConstraint,
+			testConstraint,
+			testConstraint,
+			testConstraint,
+		))
 
+		assert.Equal(t, 4, testConstraint.Calls)
+	})
+
+	t.Run("should return all constraint violations when the predicate function returns true", func(t *testing.T) {
+		testConstraint := &TestConstraint{}
+		violations := Validate(nil, WhenFn(func() bool { return true },
+			testConstraint,
+			testConstraint,
+			testConstraint,
+			testConstraint,
+		))
+
+		assert.Len(t, violations, 4)
+	})
+
+	t.Run("should not run any constraints when the predicate function returns false", func(t *testing.T) {
+		testConstraint := &TestConstraint{}
+		Validate(nil, WhenFn(func() bool { return false },
+			testConstraint,
+			testConstraint,
+			testConstraint,
+			testConstraint,
+		))
+
+		assert.Equal(t, 0, testConstraint.Calls)
+	})
+
+	t.Run("should not return any constraint violations when the predicate function returns false", func(t *testing.T) {
+		testConstraint := &TestConstraint{}
+		violations := Validate(nil, WhenFn(func() bool { return false },
+			testConstraint,
+			testConstraint,
+			testConstraint,
+			testConstraint,
+		))
+
+		assert.Len(t, violations, 0)
+	})
 }
 
 type TestConstraint struct {
