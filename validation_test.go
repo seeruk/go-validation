@@ -30,12 +30,15 @@ func BenchmarkValidate(b *testing.B) {
 
 	cc := tt.Constraints()
 
+	ctx := validation.NewContext(tt)
+	//ctx.StructTag = ""
+
 	b.ReportAllocs()
 	b.ResetTimer()
 
 	var violations []validation.ConstraintViolation
 	for i := 0; i < b.N; i++ {
-		violations = validation.Validate(tt, cc)
+		violations = validation.ValidateContext(ctx, cc)
 	}
 
 	b.Log(violations)

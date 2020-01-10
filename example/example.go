@@ -1,94 +1,75 @@
 package main
 
 import (
-	"bytes"
-	"encoding/json"
-	"fmt"
+	"regexp"
+	"time"
 
 	"github.com/seeruk/go-validation"
 	"github.com/seeruk/go-validation/constraints"
 )
 
-var foo = "foo"
+// patternGreeting is a regular expression to test that a string starts with "Hello".
+var patternGreeting = regexp.MustCompile("^Hello")
 
-func main() {
-	e := &Example{}
-	e.Text = "Hello, World"
-	e.Number = 123
-
-	e.Object = map[*string]interface{}{
-		&foo: 123,
-	}
-
-	list := &[]*string{
-		&foo,
-		nil,
-	}
-
-	list2 := &list
-
-	e.List = &list2
-	e.List = nil
-
-	e2 := &Example{}
-
-	e.Foo = &e2
-
-	var buf bytes.Buffer
-
-	ctx := validation.NewContext(e)
-	ctx.StructTag = "json"
-
-	encoder := json.NewEncoder(&buf)
-	encoder.SetIndent("", "  ")
-	encoder.Encode(validation.ValidateContext(ctx, exampleConstraints()))
-
-	fmt.Println(buf.String())
-}
+// timeYosemite is a time that represents when Yosemite National Park was founded.
+var timeYosemite = time.Date(1890, time.October, 1, 0, 0, 0, 0, time.UTC)
 
 // Example ...
 type Example struct {
-	Text   string                  `json:"text"`
-	Number int                     `json:"number"`
-	List   ***[]*string            `json:"list,omitempty"`
-	Object map[*string]interface{} `json:"object"`
-	Foo    **Example               `json:"foo"`
+	Bool      bool                       `json:"bool,omitempty"`
+	Chan      <-chan string              `json:"chan" valley:"chan"`
+	Text      string                     `json:"text"`
+	Texts     []string                   `json:"texts" valley:"texts"`
+	TextMap   map[string]string          `json:"text_map"`
+	Adults    int                        `json:"adults"`
+	Children  int                        `json:"children" valley:"children"`
+	Int       int                        `json:"int"`
+	Int2      *int                       `json:"int2" valley:"int2"`
+	Ints      []int                      `json:"ints"`
+	Float     float64                    `json:"float" valley:"float"`
+	Time      time.Time                  `json:"time" valley:"time"`
+	Times     []time.Time                `json:"times"`
+	Nested    *NestedExample             `json:"nested" valley:"nested"`
+	Nesteds   []*NestedExample           `json:"nesteds"`
+	NestedMap map[NestedExample]struct{} `json:"nested_map" valley:"nested_map"`
 }
 
-// exampleConstraints ...
 func exampleConstraints() validation.Constraint {
-	structConstraints := validation.Constraints{
-		constraints.Required,
-		constraints.MutuallyExclusive("Text", "Number"),
-	}
-
-	fieldConstraints := validation.Fields{
-		"Text": validation.Constraints{
-			constraints.Required,
-		},
-		"List": validation.Constraints{
-			constraints.Required,
-			validation.Elements{
-				constraints.Required,
-			},
-		},
-		"Object": validation.Constraints{
-			constraints.Required,
-			validation.Elements{
-				constraints.Required,
-			},
-			validation.Keys{
-				constraints.Required,
-			},
-			validation.Map{
-				&foo: constraints.Required,
-			},
-		},
-		//"Foo": validation.Lazy(exampleConstraints),
-	}
-
 	return validation.Constraints{
-		structConstraints,
-		fieldConstraints,
+		// Struct constraints ...
+		constraints.MutuallyExclusive("Text", "Texts"),
+		//constraints.MutuallyInclusive("Int", "Int2", "Ints"),
+		//constraints.ExactlyNRequired(3, "Text", "Int", "Int2", "Ints"),
+
+		validation.Fields{
+			"Text": validation.Constraints{
+				constraints.Required,
+			},
+			"TextMap": validation.Constraints{
+				constraints.Required,
+				validation.Elements{
+					constraints.Required,
+				},
+				validation.Keys{
+					constraints.Required,
+					//constraints.MinLength(10),
+				},
+			},
+			"Nested": validation.Constraints{
+				constraints.Required,
+				nestedExampleConstraints(),
+			},
+		},
+	}
+}
+
+// NestedExample ...
+type NestedExample struct {
+	Text string `json:"text"`
+}
+
+func nestedExampleConstraints() validation.Constraint {
+	return validation.Fields{
+		"Text": constraints.Required,
 	}
 }
