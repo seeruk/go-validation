@@ -1,6 +1,8 @@
 package validation
 
-import "reflect"
+import (
+	"reflect"
+)
 
 // IsEmpty checks if a value is "empty". Basically, if it's a value's zero value, nil, or has no
 // length it's considered empty.
@@ -26,7 +28,7 @@ func IsEmpty(value reflect.Value) bool {
 // IsNillable returns true if the given value is of a nillable type.
 func IsNillable(value reflect.Value) bool {
 	switch value.Kind() {
-	case reflect.Chan, reflect.Func, reflect.Interface, reflect.Map, reflect.Ptr, reflect.Slice, reflect.UnsafePointer:
+	case reflect.Chan, reflect.Func, reflect.Map, reflect.Ptr, reflect.Slice, reflect.UnsafePointer:
 		return true
 	}
 

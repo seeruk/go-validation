@@ -348,7 +348,105 @@ func TestFields(t *testing.T) {
 }
 
 func TestKeys(t *testing.T) {
+	t.Run("should run all constraints", func(t *testing.T) {
+		testConstraint := &TestConstraint{}
+		mapTester := map[string]interface{}{
+			"Foo": "Hello",
+			"Bar": 123,
+			"Baz": []string{"Hello", "World"},
+		}
 
+		Validate(mapTester, Keys{
+			testConstraint,
+		})
+
+		assert.Equal(t, 3, testConstraint.Calls)
+	})
+
+	t.Run("should return all constraint violations", func(t *testing.T) {
+		testConstraint := &TestConstraint{}
+		mapTester := map[string]interface{}{
+			"Foo": "Hello",
+			"Bar": 123,
+			"Baz": []string{"Hello", "World"},
+		}
+
+		violations := Validate(mapTester, Keys{
+			testConstraint,
+		})
+
+		assert.Len(t, violations, 3)
+	})
+
+	t.Run("should return no violations if the given value is nil", func(t *testing.T) {
+		testConstraint := &TestConstraint{}
+
+		violations := Validate((map[string]interface{})(nil), Keys{
+			testConstraint,
+			testConstraint,
+			testConstraint,
+		})
+
+		assert.Len(t, violations, 0)
+
+		// Pointers to map are also possible.
+		violations = Validate((*map[string]interface{})(nil), Keys{
+			testConstraint,
+			testConstraint,
+			testConstraint,
+		})
+
+		assert.Len(t, violations, 0)
+	})
+
+	t.Run("should return no violations if the given map is empty (but not nil)", func(t *testing.T) {
+		testConstraint := &TestConstraint{}
+
+		violations := Validate(map[string]interface{}{}, Keys{
+			testConstraint,
+			testConstraint,
+			testConstraint,
+		})
+
+		assert.Len(t, violations, 0)
+	})
+
+	t.Run("should update the context's value node to the fields of the given value", func(t *testing.T) {
+		mapTester := map[string]interface{}{
+			"Foo": "Hello",
+			"Bar": 123,
+			"Baz": []string{"Hello", "World"},
+		}
+
+		var keys []string
+
+		violations := Validate(mapTester, Keys{
+			ConstraintFunc(func(ctx Context) []ConstraintViolation {
+				keys = append(keys, ctx.Value().Node.Interface().(string))
+				return nil
+			}),
+		})
+
+		require.Len(t, violations, 0)
+		require.Len(t, keys, 3)
+		assert.Contains(t, keys, "Foo")
+		assert.Contains(t, keys, "Bar")
+		assert.Contains(t, keys, "Baz")
+	})
+
+	t.Run("should update the path", func(t *testing.T) {
+		testConstraint := &TestConstraint{}
+		mapTester := map[string]interface{}{
+			"Foo": "Hello",
+		}
+
+		violations := Validate(mapTester, Keys{
+			testConstraint,
+		})
+
+		require.Len(t, violations, 1)
+		assert.Equal(t, ".Foo", violations[0].Path)
+	})
 }
 
 func TestLazy(t *testing.T) {
@@ -371,7 +469,106 @@ func TestLazy(t *testing.T) {
 }
 
 func TestMap(t *testing.T) {
+	t.Run("should run all constraints", func(t *testing.T) {
+		testConstraint := &TestConstraint{}
+		mapTester := map[string]interface{}{
+			"Foo": "Hello",
+			"Bar": 123,
+			"Baz": []string{"Hello", "World"},
+		}
 
+		Validate(mapTester, Map{
+			"Foo": testConstraint,
+			"Bar": testConstraint,
+			"Baz": testConstraint,
+		})
+
+		assert.Equal(t, 3, testConstraint.Calls)
+	})
+
+	t.Run("should return all constraint violations", func(t *testing.T) {
+		testConstraint := &TestConstraint{}
+		mapTester := map[string]interface{}{
+			"Foo": "Hello",
+			"Bar": 123,
+			"Baz": []string{"Hello", "World"},
+		}
+
+		violations := Validate(mapTester, Map{
+			"Foo": testConstraint,
+			"Bar": testConstraint,
+			"Baz": testConstraint,
+		})
+
+		assert.Len(t, violations, 3)
+	})
+
+	t.Run("should return no violations if the given value is nil", func(t *testing.T) {
+		testConstraint := &TestConstraint{}
+
+		violations := Validate((map[string]interface{})(nil), Map{
+			"Foo": testConstraint,
+			"Bar": testConstraint,
+			"Baz": testConstraint,
+		})
+
+		assert.Len(t, violations, 0)
+
+		// Pointers to map are also possible.
+		violations = Validate((*map[string]interface{})(nil), Map{
+			"Foo": testConstraint,
+			"Bar": testConstraint,
+			"Baz": testConstraint,
+		})
+
+		assert.Len(t, violations, 0)
+	})
+
+	t.Run("should update the context's value node to the fields of the given value", func(t *testing.T) {
+		mapTester := map[string]interface{}{
+			"Foo": "Hello",
+			"Bar": 123,
+			"Baz": []string{"Hello", "World"},
+		}
+
+		var foo string
+		var bar int
+		var baz []string
+
+		violations := Validate(mapTester, Map{
+			"Foo": ConstraintFunc(func(ctx Context) []ConstraintViolation {
+				foo = ctx.Value().Node.Interface().(string)
+				return nil
+			}),
+			"Bar": ConstraintFunc(func(ctx Context) []ConstraintViolation {
+				bar = ctx.Value().Node.Interface().(int)
+				return nil
+			}),
+			"Baz": ConstraintFunc(func(ctx Context) []ConstraintViolation {
+				baz = ctx.Value().Node.Interface().([]string)
+				return nil
+			}),
+		})
+
+		require.Len(t, violations, 0)
+		assert.Equal(t, mapTester["Foo"], foo)
+		assert.Equal(t, mapTester["Bar"], bar)
+		assert.Equal(t, mapTester["Baz"], baz)
+	})
+
+	t.Run("should update the path", func(t *testing.T) {
+		testConstraint := &TestConstraint{}
+		mapTester := map[string]interface{}{
+			"Foo": "Hello",
+		}
+
+		violations := Validate(mapTester, Map{
+			"Foo": testConstraint,
+		})
+
+		require.Len(t, violations, 1)
+		assert.Equal(t, ".Foo", violations[0].Path)
+	})
 }
 
 func TestWhen(t *testing.T) {
