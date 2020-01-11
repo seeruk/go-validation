@@ -183,7 +183,7 @@ func FieldName(ctx Context, fieldName string) string {
 // MustBe will panic if the given reflect.Value is not one of the given reflect.Kind kinds.
 func MustBe(typ reflect.Type, kinds ...reflect.Kind) {
 	if len(kinds) == 0 {
-		return
+		panic("validation: at least one kind must be given to MustBe")
 	}
 
 	for _, kind := range kinds {
@@ -227,15 +227,4 @@ func UnwrapValue(val reflect.Value) reflect.Value {
 	}
 
 	return val
-}
-
-// valueString returns a string representation of the given value. It handles any type that may be
-// nil by returning "nil", otherwise defers to fmt.Sprint.
-func valueString(val reflect.Value) string {
-	unwrapped := UnwrapValue(val)
-	if IsNillable(unwrapped) && unwrapped.IsNil() {
-		return "nil"
-	}
-
-	return fmt.Sprint(unwrapped)
 }

@@ -174,3 +174,14 @@ func WhenFn(predicateFn func() bool, constraints ...Constraint) ConstraintFunc {
 		return violations
 	}
 }
+
+// valueString returns a string representation of the given value. It handles any type that may be
+// nil by returning "nil", otherwise defers to fmt.Sprint.
+func valueString(val reflect.Value) string {
+	unwrapped := UnwrapValue(val)
+	if IsNillable(unwrapped) && unwrapped.IsNil() {
+		return "nil"
+	}
+
+	return fmt.Sprint(unwrapped)
+}

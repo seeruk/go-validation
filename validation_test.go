@@ -230,15 +230,62 @@ func TestFieldName(t *testing.T) {
 }
 
 func TestMustBe(t *testing.T) {
+	t.Run("should not panic if the given type is of one of the given kinds", func(t *testing.T) {
+		assert.NotPanics(t, func() {
+			validation.MustBe(reflect.TypeOf("test"), reflect.Array, reflect.String)
+		})
+	})
 
+	t.Run("should panic if the given type is not one of the given kinds", func(t *testing.T) {
+		assert.Panics(t, func() {
+			validation.MustBe(reflect.TypeOf("test"), reflect.Array, reflect.Map)
+		})
+	})
+
+	t.Run("should panic if no kinds are given", func(t *testing.T) {
+		assert.Panics(t, func() {
+			validation.MustBe(reflect.TypeOf("hello"))
+		})
+	})
 }
 
 func TestUnwrapType(t *testing.T) {
+	t.Run("should find the root, non-pointer type of the given type", func(t *testing.T) {
+		var wrapped ****string
 
+		wrappedType := reflect.TypeOf(wrapped)
+		require.Equal(t, reflect.Ptr, wrappedType.Kind())
+
+		unwrappedType := validation.UnwrapType(wrappedType)
+		assert.Equal(t, reflect.String, unwrappedType.Kind())
+	})
+
+	t.Run("should returned types that aren't pointers", func(t *testing.T) {
+		var val string
+
+		typ := reflect.TypeOf(val)
+		assert.Equal(t, typ, validation.UnwrapType(typ))
+	})
 }
 
 func TestUnwrapValue(t *testing.T) {
+	t.Run("should return the underlying non-pointer value for the given pointer value", func(t *testing.T) {
+		val := "hello"
+		layer1 := &val
+		layer2 := &layer1
+		layer3 := &layer2
+		layer4 := &layer3
 
+		unwrapped := validation.UnwrapValue(reflect.ValueOf(layer4))
+
+		assert.Equal(t, val, unwrapped.Interface())
+	})
+
+	t.Run("should return nil values as they are", func(t *testing.T) {
+		var foo ***string
+
+		assert.Equal(t, foo, validation.UnwrapValue(reflect.ValueOf(foo)).Interface())
+	})
 }
 
 // Benchmarking ...

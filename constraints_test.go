@@ -242,6 +242,20 @@ func TestElements(t *testing.T) {
 			assert.Equal(t, ".Hello", violations[0].Path)
 		})
 
+		t.Run("against a map with a nil key", func(t *testing.T) {
+			m := map[*string]string{
+				nil: "test",
+			}
+
+			testConstraint := &TestConstraint{}
+			violations := Validate(m, Elements{
+				testConstraint,
+			})
+
+			require.Len(t, violations, 1)
+			assert.Equal(t, ".nil", violations[0].Path)
+		})
+
 		t.Run("against a slice", func(t *testing.T) {
 			a := []string{"Hello", "World"}
 
@@ -446,6 +460,20 @@ func TestKeys(t *testing.T) {
 
 		require.Len(t, violations, 1)
 		assert.Equal(t, ".Foo", violations[0].Path)
+	})
+
+	t.Run("should update the path, even with a nil key", func(t *testing.T) {
+		testConstraint := &TestConstraint{}
+		mapTester := map[*string]interface{}{
+			nil: "Hello",
+		}
+
+		violations := Validate(mapTester, Keys{
+			testConstraint,
+		})
+
+		require.Len(t, violations, 1)
+		assert.Equal(t, ".nil", violations[0].Path)
 	})
 }
 
