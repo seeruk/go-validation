@@ -44,18 +44,12 @@ func (e Elements) Violations(ctx Context) []ConstraintViolation {
 				key := iter.Key()
 				value := iter.Value()
 
-				ctx := ctx.WithValue(Value{
-					Name: valueString(key),
-					Node: value,
-				})
+				ctx := ctx.WithValue(valueString(key), value)
 				violations = append(violations, constraint.Violations(ctx)...)
 			}
 		case reflect.Array, reflect.Slice:
 			for i := 0; i < rval.Len(); i++ {
-				ctx := ctx.WithValue(Value{
-					Name: fmt.Sprintf("[%d]", i),
-					Node: rval.Index(i),
-				})
+				ctx := ctx.WithValue(fmt.Sprintf("[%d]", i), rval.Index(i))
 				violations = append(violations, constraint.Violations(ctx)...)
 			}
 		}
@@ -79,11 +73,7 @@ func (f Fields) Violations(ctx Context) []ConstraintViolation {
 	}
 
 	for fieldName, constraint := range f {
-		ctx := ctx.WithValue(Value{
-			Name: FieldName(ctx, fieldName),
-			Node: rval.FieldByName(fieldName),
-		})
-
+		ctx := ctx.WithValue(FieldName(ctx, fieldName), rval.FieldByName(fieldName))
 		violations = append(violations, constraint.Violations(ctx)...)
 	}
 
@@ -109,11 +99,7 @@ func (k Keys) Violations(ctx Context) []ConstraintViolation {
 
 	for _, constraint := range k {
 		for _, key := range rval.MapKeys() {
-			ctx := ctx.WithValue(Value{
-				Name: valueString(key),
-				Node: key,
-			}).WithPathKind(PathKindKey)
-
+			ctx := ctx.WithValue(valueString(key), key).WithPathKind(PathKindKey)
 			violations = append(violations, constraint.Violations(ctx)...)
 		}
 	}
@@ -146,10 +132,10 @@ func (m Map) Violations(ctx Context) []ConstraintViolation {
 	}
 
 	for mapKey, constraint := range m {
-		ctx := ctx.WithValue(Value{
-			Name: valueString(reflect.ValueOf(mapKey)),
-			Node: rval.MapIndex(reflect.ValueOf(mapKey)),
-		})
+		ctx := ctx.WithValue(
+			valueString(reflect.ValueOf(mapKey)),
+			rval.MapIndex(reflect.ValueOf(mapKey)),
+		)
 
 		violations = append(violations, constraint.Violations(ctx)...)
 	}

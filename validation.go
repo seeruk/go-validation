@@ -7,9 +7,9 @@ import (
 	"strings"
 )
 
-// defaultNameStructTag is the default struct tag used to override the name of struct fields in the
+// DefaultNameStructTag is the default struct tag used to override the name of struct fields in the
 // path that's output.
-const defaultNameStructTag = "validation"
+const DefaultNameStructTag = "validation"
 
 // Validate executes the given constraint(s) against the given value, returning any violations of
 // those constraints.
@@ -88,10 +88,8 @@ type Context struct {
 
 // NewContext returns a new Context, with a Value created for the given interface{} value.
 func NewContext(value interface{}) Context {
-	ctx := Context{StructTag: defaultNameStructTag}
-	return ctx.WithValue(Value{
-		Node: reflect.ValueOf(value),
-	})
+	ctx := Context{StructTag: DefaultNameStructTag}
+	return ctx.WithValue("", reflect.ValueOf(value))
 }
 
 // Value gets the current value (the last value in Values).
@@ -136,7 +134,12 @@ func (c Context) WithPathKind(pathKind PathKind) Context {
 
 // WithValue returns a shallow copy of this Context with the given value assigned, not modifying the
 // original Context.
-func (c Context) WithValue(value Value) Context {
+func (c Context) WithValue(name string, val reflect.Value) Context {
+	value := Value{
+		Name: name,
+		Node: val,
+	}
+
 	// TODO: This would be far more efficient with a linked list probably?
 	c.Values = append(c.Values, value)
 	return c
@@ -194,7 +197,11 @@ func MustBe(typ reflect.Type, kinds ...reflect.Kind) {
 		kindNames = append(kindNames, kind.String())
 	}
 
-	panic(fmt.Sprintf("validation: value must be one of: %s", strings.Join(kindNames, ", ")))
+	panic(fmt.Sprintf(
+		"validation: value must be one of: %s, got %s",
+		strings.Join(kindNames, ", "),
+		typ.Kind(),
+	))
 }
 
 // UnwrapType takes the given reflect.Type, and if it's a pointer gets the pointer element's type.
