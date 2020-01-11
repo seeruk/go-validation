@@ -41,7 +41,7 @@ func (c ConstraintFunc) Violations(ctx Context) []ConstraintViolation {
 
 // All possible PathKind values.
 const (
-	PathKindValue = iota
+	PathKindValue PathKind = iota
 	PathKindKey
 )
 
