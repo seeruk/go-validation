@@ -158,15 +158,75 @@ func TestContext_Violation(t *testing.T) {
 }
 
 func TestContext_WithPathKind(t *testing.T) {
+	t.Run("should return a copy of the original context with the given PathKind", func(t *testing.T) {
+		oldCtx := validation.NewContext("hello")
+		oldCtx.PathKind = validation.PathKindValue
 
+		newCtx := oldCtx.WithPathKind(validation.PathKindKey)
+
+		assert.NotEqual(t, oldCtx, newCtx)
+		assert.Equal(t, validation.PathKindKey, newCtx.PathKind)
+	})
 }
 
 func TestContext_WithValue(t *testing.T) {
+	t.Run("should return a copy of the original context with the given value", func(t *testing.T) {
+		oldCtx := validation.NewContext("hello")
+		newCtx := oldCtx.WithValue("subject", reflect.ValueOf("world"))
 
+		assert.NotEmpty(t, oldCtx, newCtx)
+		assert.Equal(t, newCtx.Value().Node.Interface(), "world")
+	})
 }
 
 func TestFieldName(t *testing.T) {
+	type testSubject struct {
+		Test1 string
+		Test2 string `validation:"test2"`
+		Test3 string `json:"test3,omitempty"`
+	}
 
+	t.Run("should return the given field's output name", func(t *testing.T) {
+		ts := testSubject{}
+		ctx := validation.NewContext(ts)
+
+		name := validation.FieldName(ctx, "Test1")
+
+		assert.Equal(t, "Test1", name)
+	})
+
+	t.Run("should use the 'validation' struct tag if set (default tag)", func(t *testing.T) {
+		ts := testSubject{}
+		ctx := validation.NewContext(ts)
+
+		name := validation.FieldName(ctx, "Test2")
+
+		assert.Equal(t, "test2", name)
+	})
+
+	t.Run("should other struct tags if configured, with support for CSVs in tags", func(t *testing.T) {
+		ts := testSubject{}
+		ctx := validation.NewContext(ts)
+		ctx.StructTag = "json"
+
+		name := validation.FieldName(ctx, "Test3")
+
+		assert.Equal(t, "test3", name)
+	})
+
+	t.Run("should panic if run on a type other than struct (or pointers to structs)", func(t *testing.T) {
+		ctx := validation.NewContext("test")
+		assert.Panics(t, func() {
+			validation.FieldName(ctx, "test")
+		})
+	})
+
+	t.Run("should panic if the given field doesn't exist on the struct", func(t *testing.T) {
+		ctx := validation.NewContext(testSubject{})
+		assert.Panics(t, func() {
+			validation.FieldName(ctx, "ThisFieldDoesNotExist")
+		})
+	})
 }
 
 func TestMustBe(t *testing.T) {
