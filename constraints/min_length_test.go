@@ -1,0 +1,47 @@
+package constraints
+
+import (
+	"testing"
+
+	"github.com/seeruk/go-validation"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+)
+
+func TestMinLength(t *testing.T) {
+	t.Run("should return no violations for a valid value", func(t *testing.T) {
+		violations := MinLength(1)(validation.NewContext([]string{"test"}))
+		assert.Len(t, violations, 0)
+		violations = MinLength(3)(validation.NewContext([]string{"test", "test", "test"}))
+		assert.Len(t, violations, 0)
+	})
+
+	t.Run("should return a violation if the exact length is not met", func(t *testing.T) {
+		violations := MinLength(1)(validation.NewContext([]string{}))
+		assert.Len(t, violations, 1)
+	})
+
+	t.Run("should return details about the expected length with a violation", func(t *testing.T) {
+		violations := MinLength(1)(validation.NewContext([]string{}))
+		require.Len(t, violations, 1)
+		assert.Equal(t, map[string]interface{}{
+			"minimum": 1,
+		}, violations[0].Details)
+	})
+
+	t.Run("should not panic if given values of any type 'len' can be called on", func(t *testing.T) {
+		assert.NotPanics(t, func() {
+			MinLength(1)(validation.NewContext([1]int{1}))
+			MinLength(1)(validation.NewContext(make(chan struct{})))
+			MinLength(1)(validation.NewContext(map[string]interface{}{}))
+			MinLength(1)(validation.NewContext([]string{}))
+			MinLength(1)(validation.NewContext(""))
+		})
+	})
+
+	t.Run("should panic if given a value of the wrong type", func(t *testing.T) {
+		assert.Panics(t, func() {
+			MinLength(1)(validation.NewContext(123))
+		})
+	})
+}

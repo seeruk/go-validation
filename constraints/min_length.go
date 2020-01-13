@@ -6,8 +6,8 @@ import (
 	"github.com/seeruk/go-validation"
 )
 
-// Length ...
-func Length(length int) validation.ConstraintFunc {
+// MinLength ...
+func MinLength(min int) validation.ConstraintFunc {
 	return func(ctx validation.Context) []validation.ConstraintViolation {
 		rval := validation.UnwrapValue(ctx.Value().Node)
 		if validation.IsNillable(rval) && rval.IsNil() {
@@ -18,10 +18,10 @@ func Length(length int) validation.ConstraintFunc {
 		validation.MustBe(validation.UnwrapType(rval.Type()),
 			reflect.Array, reflect.Chan, reflect.Map, reflect.Slice, reflect.String)
 
-		if rval.Len() != length {
+		if rval.Len() < min {
 			return []validation.ConstraintViolation{
-				ctx.Violation("exact length not met", map[string]interface{}{
-					"expected": length,
+				ctx.Violation("minimum length not met", map[string]interface{}{
+					"minimum": min,
 				}),
 			}
 		}
