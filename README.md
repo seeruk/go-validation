@@ -5,8 +5,10 @@ Simple and flexible Go (Golang) validation library.
 ## TODO
 
 * Finish constraints
-    * AnyNRequired
+    * AtLeastNRequired
+    * AtMostNRequired
     * ~~Equals~~
+    * ExactlyNRequired
     * ~~Length~~
     * ~~Max~~
     * ~~MaxLength~~
@@ -24,5 +26,4 @@ Simple and flexible Go (Golang) validation library.
     * ~~Required~~
     * TimeAfter
     * TimeBefore
-    * Valid
 * Add documentation to constraints.
