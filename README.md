@@ -16,7 +16,7 @@ Simple and flexible Go (Golang) validation library.
     * ~~MutuallyExclusive~~
     * MutuallyInclusive
     * ~~Nil~~
-    * NoneOf
+    * ~~NoneOf~~
     * ~~NotEquals~~
     * ~~NotNil~~
     * ~~OneOf~~
