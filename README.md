@@ -2,14 +2,18 @@
 
 Simple and flexible Go (Golang) validation library.
 
+## TODO
+
+### Finish constraints:
+
 * AnyNRequired
 * Equals
 * ExactlyNRequired
 * ~~Length~~
 * Max
-* MaxLength
+* ~~MaxLength~~
 * Min
-* MinLength
+* ~~MinLength~~
 * ~~MutuallyExclusive~~
 * MutuallyInclusive
 * Nil
@@ -25,3 +29,9 @@ Simple and flexible Go (Golang) validation library.
 * TimeStringAfter
 * TimeStringBefore
 * Valid
+
+### Tests
+
+* Write 'Max' tests.
+* Tests should also try pointers to types with nil to verify they don't panic when given nil, many
+constraints should just be optional in that case.
