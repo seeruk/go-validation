@@ -15,10 +15,10 @@ Simple and flexible Go (Golang) validation library.
     * ~~MinLength~~
     * ~~MutuallyExclusive~~
     * MutuallyInclusive
-    * Nil
+    * ~~Nil~~
     * NoneOf
     * ~~NotEquals~~
-    * NotNil
+    * ~~NotNil~~
     * ~~OneOf~~
     * Predicate
     * Regexp
