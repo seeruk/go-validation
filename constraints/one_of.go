@@ -13,7 +13,6 @@ func OneOf(allowed ...interface{}) validation.ConstraintFunc {
 	}
 
 	return func(ctx validation.Context) []validation.ConstraintViolation {
-
 		rval := validation.UnwrapValue(ctx.Value().Node)
 		if validation.IsEmpty(rval) {
 			return nil
