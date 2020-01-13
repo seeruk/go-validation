@@ -7,7 +7,6 @@ Simple and flexible Go (Golang) validation library.
 * Finish constraints
     * AnyNRequired
     * ~~Equals~~
-    * ExactlyNRequired
     * ~~Length~~
     * ~~Max~~
     * ~~MaxLength~~
