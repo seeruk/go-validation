@@ -21,6 +21,11 @@ func TestMinLength(t *testing.T) {
 		assert.Len(t, violations, 1)
 	})
 
+	t.Run("should be optional (i.e. only applied if value is not empty)", func(t *testing.T) {
+		violations := MinLength(1)(validation.NewContext([]string{}))
+		assert.Len(t, violations, 0)
+	})
+
 	t.Run("should return details about the minimum length with a violation", func(t *testing.T) {
 		violations := MinLength(2)(validation.NewContext([]string{"test"}))
 		require.Len(t, violations, 1)

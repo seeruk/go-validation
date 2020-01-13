@@ -29,6 +29,11 @@ func TestMutuallyExclusive(t *testing.T) {
 		assert.Empty(t, constraint(validation.NewContext(ts4)))
 	})
 
+	t.Run("should be optional (i.e. only applied if value is not empty)", func(t *testing.T) {
+		violations := MutuallyExclusive("Field1", "Field2")(validation.NewContext((*testSubject)(nil)))
+		assert.Len(t, violations, 0)
+	})
+
 	t.Run("should return a violation if multiple mx fields are set", func(t *testing.T) {
 		ts1 := testSubject{Field1: "hello", Field2: 1234567}
 		ts2 := testSubject{Field3: []string{"test"}, Field4: map[string]int{"test": 123}}

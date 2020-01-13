@@ -21,6 +21,11 @@ func TestMaxLength(t *testing.T) {
 		assert.Len(t, violations, 1)
 	})
 
+	t.Run("should be optional (i.e. only applied if value is not empty)", func(t *testing.T) {
+		violations := MaxLength(0)(validation.NewContext([]string{}))
+		assert.Len(t, violations, 0)
+	})
+
 	t.Run("should return details about the expected length with a violation", func(t *testing.T) {
 		violations := MaxLength(1)(validation.NewContext([]string{"foo", "bar"}))
 		require.Len(t, violations, 1)

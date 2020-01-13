@@ -22,6 +22,11 @@ func TestMax(t *testing.T) {
 		assert.NotEmpty(t, Max(1)(validation.NewContext(123.456)))
 	})
 
+	t.Run("should be optional (i.e. only applied if value is not empty)", func(t *testing.T) {
+		violations := Max(-10)(validation.NewContext(0))
+		assert.Len(t, violations, 0)
+	})
+
 	t.Run("should return details about the maximum value with a violation", func(t *testing.T) {
 		violations := Max(1)(validation.NewContext(123))
 		require.Len(t, violations, 1)
