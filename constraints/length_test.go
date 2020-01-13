@@ -39,6 +39,15 @@ func TestLength(t *testing.T) {
 		})
 	})
 
+	t.Run("should not panic if given a nil pointer to a type 'len' can be called on", func(t *testing.T) {
+		assert.NotPanics(t, func() {
+			Length(1)(validation.NewContext((*chan struct{})(nil)))
+			Length(1)(validation.NewContext((*map[string]string)(nil)))
+			Length(1)(validation.NewContext((*[]string)(nil)))
+			Length(1)(validation.NewContext((*string)(nil)))
+		})
+	})
+
 	t.Run("should panic if given a value of the wrong type", func(t *testing.T) {
 		assert.Panics(t, func() {
 			Length(1)(validation.NewContext(123))

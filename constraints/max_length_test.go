@@ -16,7 +16,7 @@ func TestMaxLength(t *testing.T) {
 		assert.Len(t, violations, 0)
 	})
 
-	t.Run("should return a violation if the exact length is not met", func(t *testing.T) {
+	t.Run("should return a violation if the max length is exceeded", func(t *testing.T) {
 		violations := MaxLength(1)(validation.NewContext([]string{"foo", "bar"}))
 		assert.Len(t, violations, 1)
 	})
@@ -36,6 +36,15 @@ func TestMaxLength(t *testing.T) {
 			MaxLength(1)(validation.NewContext(map[string]interface{}{}))
 			MaxLength(1)(validation.NewContext([]string{}))
 			MaxLength(1)(validation.NewContext(""))
+		})
+	})
+
+	t.Run("should not panic if given a nil pointer to a type 'len' can be called on", func(t *testing.T) {
+		assert.NotPanics(t, func() {
+			MaxLength(1)(validation.NewContext((*chan struct{})(nil)))
+			MaxLength(1)(validation.NewContext((*map[string]string)(nil)))
+			MaxLength(1)(validation.NewContext((*[]string)(nil)))
+			MaxLength(1)(validation.NewContext((*string)(nil)))
 		})
 	})
 

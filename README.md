@@ -10,7 +10,7 @@ Simple and flexible Go (Golang) validation library.
 * Equals
 * ExactlyNRequired
 * ~~Length~~
-* Max
+* ~~Max~~
 * ~~MaxLength~~
 * Min
 * ~~MinLength~~
@@ -29,9 +29,3 @@ Simple and flexible Go (Golang) validation library.
 * TimeStringAfter
 * TimeStringBefore
 * Valid
-
-### Tests
-
-* Write 'Max' tests.
-* Tests should also try pointers to types with nil to verify they don't panic when given nil, many
-constraints should just be optional in that case.
