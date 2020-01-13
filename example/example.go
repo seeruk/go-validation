@@ -44,6 +44,7 @@ func exampleConstraints() validation.Constraint {
 		validation.Fields{
 			"Text": validation.Constraints{
 				constraints.Required,
+				constraints.OneOf("hello", "world", "example"),
 			},
 			"TextMap": validation.Constraints{
 				constraints.Required,

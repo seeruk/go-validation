@@ -10,7 +10,7 @@ import (
 func MaxLength(max int) validation.ConstraintFunc {
 	return func(ctx validation.Context) []validation.ConstraintViolation {
 		rval := validation.UnwrapValue(ctx.Value().Node)
-		if validation.IsNillable(rval) && rval.IsNil() {
+		if validation.IsEmpty(rval) {
 			return nil
 		}
 

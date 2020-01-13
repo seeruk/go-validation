@@ -17,12 +17,12 @@ func TestLength(t *testing.T) {
 	})
 
 	t.Run("should return a violation if the exact length is not met", func(t *testing.T) {
-		violations := Length(1)(validation.NewContext([]string{}))
+		violations := Length(1)(validation.NewContext([]string{"hello", "world"}))
 		assert.Len(t, violations, 1)
 	})
 
 	t.Run("should return details about the expected length with a violation", func(t *testing.T) {
-		violations := Length(1)(validation.NewContext([]string{}))
+		violations := Length(1)(validation.NewContext([]string{"hello", "world"}))
 		require.Len(t, violations, 1)
 		assert.Equal(t, map[string]interface{}{
 			"expected": 1,

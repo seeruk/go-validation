@@ -17,15 +17,15 @@ func TestMinLength(t *testing.T) {
 	})
 
 	t.Run("should return a violation if the minimum length is not met", func(t *testing.T) {
-		violations := MinLength(1)(validation.NewContext([]string{}))
+		violations := MinLength(2)(validation.NewContext([]string{"test"}))
 		assert.Len(t, violations, 1)
 	})
 
 	t.Run("should return details about the minimum length with a violation", func(t *testing.T) {
-		violations := MinLength(1)(validation.NewContext([]string{}))
+		violations := MinLength(2)(validation.NewContext([]string{"test"}))
 		require.Len(t, violations, 1)
 		assert.Equal(t, map[string]interface{}{
-			"minimum": 1,
+			"minimum": 2,
 		}, violations[0].Details)
 	})
 
