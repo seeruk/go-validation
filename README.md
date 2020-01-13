@@ -18,14 +18,11 @@ Simple and flexible Go (Golang) validation library.
     * Nil
     * NotEquals
     * NotNil
-    * OneOf
+    * ~~OneOf~~
     * Predicate
     * Regexp
-    * RegexpString
     * ~~Required~~
     * TimeAfter
     * TimeBefore
-    * TimeStringAfter
-    * TimeStringBefore
     * Valid
 * Add documentation to constraints.
