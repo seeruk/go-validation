@@ -22,7 +22,7 @@ Simple and flexible Go (Golang) validation library.
     * ~~NotNil~~
     * ~~OneOf~~
     * Predicate
-    * Regexp
+    * ~~Regexp~~
     * ~~Required~~
     * TimeAfter
     * TimeBefore
