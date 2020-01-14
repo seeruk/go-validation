@@ -39,7 +39,7 @@ func exampleConstraints() validation.Constraint {
 		// Struct constraints ...
 		constraints.MutuallyExclusive("Text", "Texts"),
 		constraints.MutuallyInclusive("Int", "Int2", "Ints"),
-		//constraints.ExactlyNRequired(3, "Text", "Int", "Int2", "Ints"),
+		constraints.ExactlyNRequired(3, "Text", "Int", "Int2", "Ints"),
 
 		validation.Fields{
 			"Text": validation.Constraints{
