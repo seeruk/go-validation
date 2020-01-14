@@ -27,3 +27,4 @@ Simple and flexible Go (Golang) validation library.
     * TimeAfter
     * TimeBefore
 * Add documentation to constraints.
+* Check if we can do any more constraint argument validation before returning the Constraint.
