@@ -24,6 +24,6 @@ Simple and flexible Go (Golang) validation library.
     * ~~Regexp~~
     * ~~Required~~
     * ~~TimeAfter~~
-    * TimeBefore
+    * ~~TimeBefore~~
 * Add documentation to constraints.
 * Check if we can do any more constraint argument validation before returning the Constraint.
