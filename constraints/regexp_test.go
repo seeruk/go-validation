@@ -38,8 +38,10 @@ func TestRegexp(t *testing.T) {
 	})
 
 	t.Run("should not panic if given a nil pointer", func(t *testing.T) {
-		assert.NotPanics(t, func() {
-			Regexp(pattern)(validation.NewContext((*string)(nil)))
-		})
+		assert.NotPanics(t, func() { Regexp(pattern)(validation.NewContext((*string)(nil))) })
+	})
+
+	t.Run("should panic if given a value of the wrong type, even if it's empty", func(t *testing.T) {
+		assert.Panics(t, func() { Regexp(pattern)(validation.NewContext(0)) })
 	})
 }

@@ -58,9 +58,8 @@ func TestMin(t *testing.T) {
 		})
 	})
 
-	t.Run("should panic if given a value of the wrong type", func(t *testing.T) {
-		assert.Panics(t, func() {
-			Min(1)(validation.NewContext("test"))
-		})
+	t.Run("should panic if given a value of the wrong type, even if it's empty", func(t *testing.T) {
+		assert.Panics(t, func() { Min(1)(validation.NewContext("test")) })
+		assert.Panics(t, func() { Min(1)(validation.NewContext("")) })
 	})
 }

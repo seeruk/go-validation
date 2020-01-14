@@ -10,11 +10,11 @@ import (
 func MutuallyInclusive(fields ...string) validation.ConstraintFunc {
 	return func(ctx validation.Context) []validation.ConstraintViolation {
 		rval := validation.UnwrapValue(ctx.Value().Node)
+		validation.MustBe(validation.UnwrapType(rval.Type()), reflect.Struct)
+
 		if validation.IsEmpty(rval) {
 			return nil
 		}
-
-		validation.MustBe(validation.UnwrapType(rval.Type()), reflect.Struct)
 
 		fieldNames := make([]string, 0, len(fields))
 

@@ -10,11 +10,11 @@ import (
 func MutuallyExclusive(fields ...string) validation.ConstraintFunc {
 	return func(ctx validation.Context) []validation.ConstraintViolation {
 		rval := validation.UnwrapValue(ctx.Value().Node)
+		validation.MustBe(validation.UnwrapType(rval.Type()), reflect.Struct)
+
 		if validation.IsEmpty(rval) {
 			return nil
 		}
-
-		validation.MustBe(validation.UnwrapType(rval.Type()), reflect.Struct)
 
 		var nonEmpty []string
 		for _, field := range fields {

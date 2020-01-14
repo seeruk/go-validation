@@ -38,7 +38,7 @@ func exampleConstraints() validation.Constraint {
 	return validation.Constraints{
 		// Struct constraints ...
 		constraints.MutuallyExclusive("Text", "Texts"),
-		//constraints.MutuallyInclusive("Int", "Int2", "Ints"),
+		constraints.MutuallyInclusive("Int", "Int2", "Ints"),
 		//constraints.ExactlyNRequired(3, "Text", "Int", "Int2", "Ints"),
 
 		validation.Fields{
@@ -53,7 +53,7 @@ func exampleConstraints() validation.Constraint {
 				},
 				validation.Keys{
 					constraints.Required,
-					//constraints.MinLength(10),
+					constraints.MinLength(10),
 				},
 			},
 			"Nested": validation.Constraints{

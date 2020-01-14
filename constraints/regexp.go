@@ -11,11 +11,11 @@ import (
 func Regexp(pattern *regexp.Regexp) validation.ConstraintFunc {
 	return func(ctx validation.Context) []validation.ConstraintViolation {
 		rval := validation.UnwrapValue(ctx.Value().Node)
+		validation.MustBe(validation.UnwrapType(rval.Type()), reflect.String)
+
 		if validation.IsEmpty(rval) {
 			return nil
 		}
-
-		validation.MustBe(validation.UnwrapType(rval.Type()), reflect.String)
 
 		if !pattern.MatchString(rval.String()) {
 			return []validation.ConstraintViolation{

@@ -1,6 +1,7 @@
 package constraints
 
 import (
+	"net/url"
 	"testing"
 
 	"github.com/seeruk/go-validation"
@@ -65,5 +66,11 @@ func TestMutuallyExclusive(t *testing.T) {
 	t.Run("should return no violations if the value is nil", func(t *testing.T) {
 		var ts *testSubject
 		assert.Empty(t, constraint(validation.NewContext(ts)))
+	})
+
+	t.Run("should panic if given a value of the wrong type, even if it's empty", func(t *testing.T) {
+		assert.Panics(t, func() { constraint(validation.NewContext("")) })
+		assert.Panics(t, func() { constraint(validation.NewContext(0)) })
+		assert.Panics(t, func() { constraint(validation.NewContext(url.Values{})) })
 	})
 }
