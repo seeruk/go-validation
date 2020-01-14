@@ -6,6 +6,7 @@ import (
 
 	"github.com/seeruk/go-validation"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestMutuallyInclusive(t *testing.T) {
@@ -49,6 +50,7 @@ func TestMutuallyInclusive(t *testing.T) {
 
 		violations := constraint(validation.NewContext(ts))
 
+		require.Len(t, violations, 1)
 		assert.Equal(t, map[string]interface{}{
 			"fields": []string{"Field1", "Field2", "field3", "field4"},
 		}, violations[0].Details)
@@ -59,6 +61,7 @@ func TestMutuallyInclusive(t *testing.T) {
 
 		violations := constraint(validation.NewContext(ts))
 
+		require.Len(t, violations, 1)
 		assert.Equal(t, map[string]interface{}{
 			"fields": []string{"Field1", "Field2", "field3", "field4"},
 		}, violations[0].Details)
