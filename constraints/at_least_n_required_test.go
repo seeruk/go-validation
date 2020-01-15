@@ -19,7 +19,7 @@ func TestAtLeastNRequired(t *testing.T) {
 
 	constraint := AtLeastNRequired(2, "Field1", "Field2", "Field3", "Field4")
 
-	t.Run("should return no violations for a valid value", func(t *testing.T) {
+	t.Run("should return no violations if minimum number of fields is met", func(t *testing.T) {
 		ts1 := testSubject{Field1: "hello", Field2: 1234567}
 		ts2 := testSubject{Field3: []string{"test"}, Field4: map[string]int{"test": 123}}
 

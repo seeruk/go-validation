@@ -19,7 +19,7 @@ func TestMutuallyInclusive(t *testing.T) {
 
 	constraint := MutuallyInclusive("Field1", "Field2", "Field3", "Field4")
 
-	t.Run("should return no violations for a valid value", func(t *testing.T) {
+	t.Run("should return no violations if all mutually inclusive fields are set", func(t *testing.T) {
 		ts1 := testSubject{
 			Field1: "hello",
 			Field2: 123,
@@ -32,7 +32,7 @@ func TestMutuallyInclusive(t *testing.T) {
 		assert.Empty(t, constraint(validation.NewContext(ts1)))
 	})
 
-	t.Run("should return a violation if all mi fields are not set", func(t *testing.T) {
+	t.Run("should return a violation if all mutually inclusive fields are not set", func(t *testing.T) {
 		ts1 := testSubject{Field1: "hello", Field2: 1234567}
 		ts2 := testSubject{Field3: []string{"test"}, Field4: map[string]int{"test": 123}}
 

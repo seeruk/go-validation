@@ -9,10 +9,10 @@ import (
 )
 
 func TestMinLength(t *testing.T) {
-	t.Run("should return no violations for a valid value", func(t *testing.T) {
+	t.Run("should return no violations if the minimum length is met or exceeded", func(t *testing.T) {
 		violations := MinLength(1)(validation.NewContext([]string{"test"}))
 		assert.Len(t, violations, 0)
-		violations = MinLength(3)(validation.NewContext([]string{"test", "test", "test"}))
+		violations = MinLength(3)(validation.NewContext([]string{"test", "test", "test", "test"}))
 		assert.Len(t, violations, 0)
 	})
 

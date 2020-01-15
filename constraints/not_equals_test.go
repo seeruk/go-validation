@@ -9,7 +9,7 @@ import (
 )
 
 func TestNotEquals(t *testing.T) {
-	t.Run("should return no violations for a valid value", func(t *testing.T) {
+	t.Run("should return no violations if the values are not equal", func(t *testing.T) {
 		violations := NotEquals(1)(validation.NewContext(0))
 		assert.Len(t, violations, 0)
 		violations = NotEquals("hello")(validation.NewContext("goodbye"))

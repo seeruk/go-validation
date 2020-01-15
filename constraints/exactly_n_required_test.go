@@ -19,7 +19,7 @@ func TestExactlyNRequired(t *testing.T) {
 
 	constraint := ExactlyNRequired(1, "Field1", "Field2", "Field3", "Field4")
 
-	t.Run("should return no violations for a valid value", func(t *testing.T) {
+	t.Run("should return no violations if the number of fields set does match the expected exact number", func(t *testing.T) {
 		ts1 := testSubject{Field1: "hello"}
 		ts2 := testSubject{Field3: []string{"test"}}
 
@@ -27,7 +27,7 @@ func TestExactlyNRequired(t *testing.T) {
 		assert.Empty(t, constraint(validation.NewContext(ts2)))
 	})
 
-	t.Run("should return a violation if exact number of fields are not set", func(t *testing.T) {
+	t.Run("should return a violation if the number of fields set doesn't match the expected exact number", func(t *testing.T) {
 		ts1 := testSubject{Field1: "hello", Field2: 123}
 		ts2 := testSubject{Field3: []string{"test"}, Field4: map[string]int{"test": 123}}
 

@@ -9,7 +9,7 @@ import (
 )
 
 func TestMaxLength(t *testing.T) {
-	t.Run("should return no violations for a valid value", func(t *testing.T) {
+	t.Run("should return no violations is the max length is not exceeded", func(t *testing.T) {
 		violations := MaxLength(1)(validation.NewContext([]string{"test"}))
 		assert.Len(t, violations, 0)
 		violations = MaxLength(3)(validation.NewContext([]string{"test", "test", "test"}))

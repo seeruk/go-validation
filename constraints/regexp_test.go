@@ -12,7 +12,7 @@ import (
 func TestRegexp(t *testing.T) {
 	pattern := regexp.MustCompile("^Hello, ")
 
-	t.Run("should return no violations for a valid value", func(t *testing.T) {
+	t.Run("should return no violations if the value does match the given regexp", func(t *testing.T) {
 		violations := Regexp(pattern)(validation.NewContext("Hello, World!"))
 		assert.Len(t, violations, 0)
 		violations = Regexp(pattern)(validation.NewContext("Hello, Go!"))

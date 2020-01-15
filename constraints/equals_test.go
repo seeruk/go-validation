@@ -9,7 +9,7 @@ import (
 )
 
 func TestEquals(t *testing.T) {
-	t.Run("should return no violations for a valid value", func(t *testing.T) {
+	t.Run("should return no violations if the values are equal", func(t *testing.T) {
 		violations := Equals(1)(validation.NewContext(1))
 		assert.Len(t, violations, 0)
 		violations = Equals("hello")(validation.NewContext("hello"))

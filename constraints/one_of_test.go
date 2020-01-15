@@ -9,7 +9,7 @@ import (
 )
 
 func TestOneOf(t *testing.T) {
-	t.Run("should return no violations for a valid value", func(t *testing.T) {
+	t.Run("should return no violations if the value is one of the allowed values", func(t *testing.T) {
 		violations := OneOf("test", "foo", "bar")(validation.NewContext("test"))
 		assert.Len(t, violations, 0)
 		violations = OneOf("foo", "test", "bar")(validation.NewContext("test"))

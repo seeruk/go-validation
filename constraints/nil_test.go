@@ -9,7 +9,7 @@ import (
 )
 
 func TestNil(t *testing.T) {
-	t.Run("should return no violations for a valid value", func(t *testing.T) {
+	t.Run("should return no violations if the value is nil", func(t *testing.T) {
 		violations := Nil(validation.NewContext(([]string)(nil)))
 		assert.Len(t, violations, 0)
 		violations = Nil(validation.NewContext((*time.Time)(nil)))

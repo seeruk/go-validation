@@ -19,7 +19,7 @@ func TestMutuallyExclusive(t *testing.T) {
 
 	constraint := MutuallyExclusive("Field1", "Field2", "Field3", "Field4")
 
-	t.Run("should return no violations for a valid value", func(t *testing.T) {
+	t.Run("should return no violations if multiple mx fields are not set", func(t *testing.T) {
 		ts1 := testSubject{Field1: "hello"}
 		ts2 := testSubject{Field2: 1234567}
 		ts3 := testSubject{Field3: []string{"test"}}

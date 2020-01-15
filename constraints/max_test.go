@@ -10,10 +10,11 @@ import (
 )
 
 func TestMax(t *testing.T) {
-	t.Run("should return no violations for a valid value", func(t *testing.T) {
+	t.Run("should return no violations if the maximum value is not exceeded", func(t *testing.T) {
 		assert.Empty(t, Max(math.MaxFloat64)(validation.NewContext(123)))
 		assert.Empty(t, Max(math.MaxFloat64)(validation.NewContext(uint(123))))
 		assert.Empty(t, Max(math.MaxFloat64)(validation.NewContext(123.456)))
+		assert.Empty(t, Max(math.MaxFloat64)(validation.NewContext(math.MaxFloat64)))
 	})
 
 	t.Run("should return a violation if the maximum value is exceeded", func(t *testing.T) {

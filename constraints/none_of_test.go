@@ -9,7 +9,7 @@ import (
 )
 
 func TestNoneOf(t *testing.T) {
-	t.Run("should return no violations for a valid value", func(t *testing.T) {
+	t.Run("should return no violations if the value is not one of the disallowed values", func(t *testing.T) {
 		violations := NoneOf("test", "foo", "bar")(validation.NewContext("bla"))
 		assert.Len(t, violations, 0)
 		violations = NoneOf("foo", "test", "bar")(validation.NewContext("bla"))

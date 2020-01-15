@@ -19,7 +19,7 @@ func TestAtMostNRequired(t *testing.T) {
 
 	constraint := AtMostNRequired(1, "Field1", "Field2", "Field3", "Field4")
 
-	t.Run("should return no violations for a valid value", func(t *testing.T) {
+	t.Run("should return no violations if maximum number of fields is not exceeded", func(t *testing.T) {
 		ts1 := testSubject{Field1: "hello"}
 		ts2 := testSubject{Field3: []string{"test"}}
 

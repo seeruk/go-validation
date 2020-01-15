@@ -16,7 +16,7 @@ func TestTimeAfter(t *testing.T) {
 	present := time.Date(2020, time.January, 1, 0, 0, 0, 0, time.UTC)
 	future := time.Date(3000, time.January, 1, 0, 0, 0, 0, time.UTC)
 
-	t.Run("should return no violations for a valid value", func(t *testing.T) {
+	t.Run("should return no violations if the context's time is after the constraints 'after' time", func(t *testing.T) {
 		violations := TimeAfter(past)(validation.NewContext(present))
 		assert.Len(t, violations, 0)
 	})

@@ -10,7 +10,8 @@ import (
 )
 
 func TestMin(t *testing.T) {
-	t.Run("should return no violations for a valid value", func(t *testing.T) {
+	t.Run("should return no violations if the minimum value is met or exceeded", func(t *testing.T) {
+		assert.Empty(t, Min(1)(validation.NewContext(1)))
 		assert.Empty(t, Min(0)(validation.NewContext(123)))
 		assert.Empty(t, Min(0)(validation.NewContext(uint(123))))
 		assert.Empty(t, Min(0)(validation.NewContext(123.456)))
