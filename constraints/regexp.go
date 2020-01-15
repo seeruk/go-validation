@@ -20,6 +20,7 @@ func Regexp(pattern *regexp.Regexp) validation.ConstraintFunc {
 		if !pattern.MatchString(rval.String()) {
 			return []validation.ConstraintViolation{
 				ctx.Violation("value must match regular expression", map[string]interface{}{
+					// TODO: Include actual value?
 					"regexp": pattern.String(),
 				}),
 			}

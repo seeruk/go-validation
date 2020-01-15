@@ -22,6 +22,7 @@ func TimeBefore(before time.Time) validation.ConstraintFunc {
 			if !v.Before(before) {
 				return []validation.ConstraintViolation{
 					ctx.Violation("value must be before time", map[string]interface{}{
+						// TODO: before_time and actual_time?
 						"time": before.Format(time.RFC3339),
 					}),
 				}

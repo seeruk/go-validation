@@ -22,6 +22,7 @@ func TimeAfter(after time.Time) validation.ConstraintFunc {
 			if !v.After(after) {
 				return []validation.ConstraintViolation{
 					ctx.Violation("value must be after time", map[string]interface{}{
+						// TODO: after_time and actual_time?
 						"time": after.Format(time.RFC3339),
 					}),
 				}
