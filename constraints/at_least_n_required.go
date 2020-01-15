@@ -50,6 +50,7 @@ func AtLeastNRequired(n int, fields ...string) validation.ConstraintFunc {
 		if len(nonEmpty) < n {
 			return []validation.ConstraintViolation{
 				ctx.Violation("minimum number of required fields not met", map[string]interface{}{
+					"actual":  len(nonEmpty),
 					"minimum": n,
 					"fields":  fieldNames,
 				}),

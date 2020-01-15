@@ -30,6 +30,7 @@ func TestMaxLength(t *testing.T) {
 		violations := MaxLength(1)(validation.NewContext([]string{"foo", "bar"}))
 		require.Len(t, violations, 1)
 		assert.Equal(t, map[string]interface{}{
+			"actual":  2,
 			"maximum": 1,
 		}, violations[0].Details)
 	})

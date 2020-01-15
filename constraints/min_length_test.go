@@ -30,6 +30,7 @@ func TestMinLength(t *testing.T) {
 		violations := MinLength(2)(validation.NewContext([]string{"test"}))
 		require.Len(t, violations, 1)
 		assert.Equal(t, map[string]interface{}{
+			"actual":  1,
 			"minimum": 2,
 		}, violations[0].Details)
 	})

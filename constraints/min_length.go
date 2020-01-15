@@ -22,6 +22,7 @@ func MinLength(min int) validation.ConstraintFunc {
 		if rval.Len() < min {
 			return []validation.ConstraintViolation{
 				ctx.Violation("minimum length not met", map[string]interface{}{
+					"actual":  rval.Len(),
 					"minimum": min,
 				}),
 			}

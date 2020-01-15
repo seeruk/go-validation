@@ -30,6 +30,7 @@ func TestLength(t *testing.T) {
 		violations := Length(1)(validation.NewContext([]string{"hello", "world"}))
 		require.Len(t, violations, 1)
 		assert.Equal(t, map[string]interface{}{
+			"actual":   2,
 			"expected": 1,
 		}, violations[0].Details)
 	})

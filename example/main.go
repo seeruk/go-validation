@@ -4,17 +4,29 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"math"
+	"time"
 
 	"github.com/seeruk/go-validation"
 )
 
 func main() {
-	e := Example{}
-	e.TextMap = map[string]string{
-		"Hello": "World!",
+	example := Example{}
+	example.Bool = true
+	example.Text = "Hello, GitHub!"
+	example.TextMap = map[string]string{"hello longer key": "world"}
+	example.Int = 999
+	example.Int2 = &example.Int
+	example.Ints = []int{1}
+	example.Float = math.Pi
+	example.Nested = &NestedExample{Text: "Hello, GitHub!"}
+	example.Adults = 2
+	example.Children = 4
+	example.Times = []time.Time{
+		time.Date(1800, time.January, 1, 0, 0, 0, 0, time.UTC),
 	}
 
-	violations := validation.Validate(e, exampleConstraints())
+	violations := validation.Validate(example, exampleConstraints(example))
 
 	var buf bytes.Buffer
 

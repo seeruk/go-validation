@@ -50,6 +50,7 @@ func ExactlyNRequired(n int, fields ...string) validation.ConstraintFunc {
 		if len(nonEmpty) != n {
 			return []validation.ConstraintViolation{
 				ctx.Violation("exact number of required fields not met", map[string]interface{}{
+					"actual":   len(nonEmpty),
 					"expected": n,
 					"fields":   fieldNames,
 				}),

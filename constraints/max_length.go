@@ -22,6 +22,7 @@ func MaxLength(max int) validation.ConstraintFunc {
 		if rval.Len() > max {
 			return []validation.ConstraintViolation{
 				ctx.Violation("maximum length exceeded", map[string]interface{}{
+					"actual":  rval.Len(),
 					"maximum": max,
 				}),
 			}

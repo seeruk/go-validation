@@ -47,6 +47,7 @@ func TestExactlyNRequired(t *testing.T) {
 
 		require.Len(t, violations, 1)
 		assert.Equal(t, map[string]interface{}{
+			"actual":   2,
 			"expected": 1,
 			"fields":   []string{"Field1", "Field2", "field3", "field4"},
 		}, violations[0].Details)

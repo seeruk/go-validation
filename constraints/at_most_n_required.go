@@ -50,6 +50,7 @@ func AtMostNRequired(n int, fields ...string) validation.ConstraintFunc {
 		if len(nonEmpty) > n {
 			return []validation.ConstraintViolation{
 				ctx.Violation("maximum number of required fields exceeded", map[string]interface{}{
+					"actual":  len(nonEmpty),
 					"maximum": n,
 					"fields":  fieldNames,
 				}),

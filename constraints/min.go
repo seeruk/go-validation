@@ -21,18 +21,18 @@ func Min(min float64) validation.ConstraintFunc {
 			return nil
 		}
 
-		var violated bool
+		var actual float64
 
 		switch rval.Kind() {
 		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-			violated = float64(rval.Int()) < min
+			actual = float64(rval.Int())
 		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-			violated = float64(rval.Uint()) < min
+			actual = float64(rval.Uint())
 		case reflect.Float32, reflect.Float64:
-			violated = rval.Float() < min
+			actual = rval.Float()
 		}
 
-		if violated {
+		if actual < min {
 			return []validation.ConstraintViolation{
 				ctx.Violation("minimum value not met", map[string]interface{}{
 					"minimum": min,

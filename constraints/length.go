@@ -22,6 +22,7 @@ func Length(length int) validation.ConstraintFunc {
 		if rval.Len() != length {
 			return []validation.ConstraintViolation{
 				ctx.Violation("exact length not met", map[string]interface{}{
+					"actual":   rval.Len(),
 					"expected": length,
 				}),
 			}

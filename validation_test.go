@@ -1,8 +1,11 @@
 package validation_test
 
 import (
+	"math"
 	"reflect"
+	"regexp"
 	"testing"
+	"time"
 
 	"github.com/seeruk/go-validation"
 	"github.com/seeruk/go-validation/constraints"
@@ -289,30 +292,145 @@ func TestUnwrapValue(t *testing.T) {
 }
 
 // Benchmarking ...
-type testType struct {
-	Text   string `validation:"text"`
-	Number int    `validation:"number"`
+
+// patternGreeting is a regular expression to test that a string starts with "Hello".
+var patternGreeting = regexp.MustCompile("^Hello")
+
+// timeYosemite is a time that represents when Yosemite National Park was founded.
+var timeYosemite = time.Date(1890, time.October, 1, 0, 0, 0, 0, time.UTC)
+
+// testSubject1 ...
+type testSubject1 struct {
+	Bool      bool                      `json:"bool,omitempty"`
+	Chan      <-chan string             `json:"chan" validation:"chan"`
+	Text      string                    `json:"text"`
+	Texts     []string                  `json:"texts" validation:"texts"`
+	TextMap   map[string]string         `json:"text_map"`
+	Adults    int                       `json:"adults"`
+	Children  int                       `json:"children" validation:"children"`
+	Int       int                       `json:"int"`
+	Int2      *int                      `json:"int2" validation:"int2"`
+	Ints      []int                     `json:"ints"`
+	Float     float64                   `json:"float" validation:"float"`
+	Time      time.Time                 `json:"time" validation:"time"`
+	Times     []time.Time               `json:"times"`
+	Nested    *testSubject2             `json:"nested" validation:"nested"`
+	Nesteds   []*testSubject2           `json:"nesteds"`
+	NestedMap map[testSubject2]struct{} `json:"nested_map" validation:"nested_map"`
 }
 
-func (tt testType) Constraints() validation.Constraint {
+func (e testSubject1) Constraints() validation.Constraint {
 	return validation.Constraints{
-		constraints.MutuallyExclusive("Text", "Number"),
+		// Struct constraints ...
+		constraints.MutuallyExclusive("Text", "Texts"),
+		constraints.MutuallyInclusive("Int", "Int2", "Ints"),
+		constraints.AtLeastNRequired(3, "Text", "Int", "Int2", "Ints"),
+
 		validation.Fields{
-			"Text":   constraints.Required,
-			"Number": constraints.Required,
+			"Bool": validation.Constraints{
+				constraints.NotEquals(false),
+				constraints.Equals(true),
+			},
+			"Chan": constraints.MaxLength(12),
+			"Text": validation.Constraints{
+				constraints.Required,
+				constraints.Regexp(patternGreeting),
+				constraints.MaxLength(14),
+				constraints.Length(14),
+				constraints.OneOf("Hello, World!", "Hello, SeerUK!", "Hello, GitHub!"),
+			},
+			"TextMap": validation.Constraints{
+				constraints.Required,
+				validation.Elements{
+					constraints.Required,
+				},
+				validation.Keys{
+					constraints.MinLength(10),
+				},
+			},
+			"Int": constraints.Required,
+			"Int2": validation.Constraints{
+				constraints.Required,
+				constraints.NotNil,
+				constraints.Min(0),
+			},
+			"Ints": validation.Constraints{
+				constraints.Required,
+				constraints.MaxLength(3),
+				validation.Elements{
+					constraints.Required,
+					constraints.Min(0),
+				},
+			},
+			"Float": constraints.Equals(math.Pi),
+			"Time":  constraints.TimeBefore(timeYosemite),
+			"Times": validation.Constraints{
+				constraints.MinLength(1),
+				validation.Elements{
+					constraints.TimeBefore(timeYosemite),
+				},
+			},
+			"Adults": validation.Constraints{
+				constraints.Min(1),
+				constraints.Max(9),
+			},
+			"Children": validation.Constraints{
+				constraints.Min(0),
+				constraints.Equals(e.Adults + 2),
+				constraints.Max(math.Max(float64(8-(e.Adults-1)), 0)),
+			},
+			"Nested": validation.Constraints{
+				constraints.Required,
+				testSubject2Constraints(),
+			},
+			"Nesteds": validation.Elements{
+				testSubject2Constraints(),
+			},
+			"NestedMap": validation.Keys{
+				testSubject2Constraints(),
+			},
 		},
+
+		validation.When(
+			len(e.Text) > 32,
+			validation.Constraints{
+				constraints.Required,
+				constraints.MinLength(64),
+			},
+		),
 	}
 }
 
-func BenchmarkValidate(b *testing.B) {
-	tt := testType{
-		Text:   "Hello, World",
-		Number: 12345678901234,
+// testSubject2 ...
+type testSubject2 struct {
+	Text string `json:"text"`
+}
+
+func testSubject2Constraints() validation.Constraint {
+	return validation.Fields{
+		"Text": constraints.Required,
+	}
+}
+
+func BenchmarkValidateHappy(b *testing.B) {
+	ts := testSubject1{}
+	ts.Bool = true
+	ts.Text = "Hello, GitHub!"
+	ts.TextMap = map[string]string{"hello longer key": "world"}
+	ts.Int = 999
+	ts.Int2 = &ts.Int
+	ts.Ints = []int{1}
+	ts.Float = math.Pi
+	ts.Nested = &testSubject2{Text: "Hello, GitHub!"}
+	ts.Adults = 2
+	ts.Children = 4
+	ts.Times = []time.Time{
+		time.Date(1800, time.January, 1, 0, 0, 0, 0, time.UTC),
 	}
 
-	cc := tt.Constraints()
+	cc := ts.Constraints()
 
-	ctx := validation.NewContext(tt)
+	ctx := validation.NewContext(ts)
 	//ctx.StructTag = ""
 
 	b.ReportAllocs()
@@ -324,7 +442,7 @@ func BenchmarkValidate(b *testing.B) {
 	}
 
 	b.Log(violations)
-	if len(violations) == 0 {
-		b.Error("expected constraint violations")
+	if len(violations) != 0 {
+		b.Error("expected no constraint violations")
 	}
 }

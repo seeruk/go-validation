@@ -1,6 +1,7 @@
 package main
 
 import (
+	"math"
 	"regexp"
 	"time"
 
@@ -34,17 +35,25 @@ type Example struct {
 	NestedMap map[NestedExample]struct{} `json:"nested_map" validation:"nested_map"`
 }
 
-func exampleConstraints() validation.Constraint {
+func exampleConstraints(e Example) validation.Constraint {
 	return validation.Constraints{
 		// Struct constraints ...
 		constraints.MutuallyExclusive("Text", "Texts"),
 		constraints.MutuallyInclusive("Int", "Int2", "Ints"),
-		constraints.ExactlyNRequired(3, "Text", "Int", "Int2", "Ints"),
+		constraints.AtLeastNRequired(3, "Text", "Int", "Int2", "Ints"),
 
 		validation.Fields{
+			"Bool": validation.Constraints{
+				constraints.NotEquals(false),
+				constraints.Equals(true),
+			},
+			"Chan": constraints.MaxLength(12),
 			"Text": validation.Constraints{
 				constraints.Required,
-				constraints.OneOf("hello", "world", "example"),
+				constraints.Regexp(patternGreeting),
+				constraints.MaxLength(14),
+				constraints.Length(14),
+				constraints.OneOf("Hello, World!", "Hello, SeerUK!", "Hello, GitHub!"),
 			},
 			"TextMap": validation.Constraints{
 				constraints.Required,
@@ -52,15 +61,59 @@ func exampleConstraints() validation.Constraint {
 					constraints.Required,
 				},
 				validation.Keys{
-					constraints.Required,
 					constraints.MinLength(10),
 				},
+			},
+			"Int": constraints.Required,
+			"Int2": validation.Constraints{
+				constraints.Required,
+				constraints.NotNil,
+				constraints.Min(0),
+			},
+			"Ints": validation.Constraints{
+				constraints.Required,
+				constraints.MaxLength(3),
+				validation.Elements{
+					constraints.Required,
+					constraints.Min(0),
+				},
+			},
+			"Float": constraints.Equals(math.Pi),
+			"Time":  constraints.TimeBefore(timeYosemite),
+			"Times": validation.Constraints{
+				constraints.MinLength(1),
+				validation.Elements{
+					constraints.TimeBefore(timeYosemite),
+				},
+			},
+			"Adults": validation.Constraints{
+				constraints.Min(1),
+				constraints.Max(9),
+			},
+			"Children": validation.Constraints{
+				constraints.Min(0),
+				constraints.Equals(e.Adults + 2),
+				constraints.Max(math.Max(float64(8-(e.Adults-1)), 0)),
 			},
 			"Nested": validation.Constraints{
 				constraints.Required,
 				nestedExampleConstraints(),
 			},
+			"Nesteds": validation.Elements{
+				nestedExampleConstraints(),
+			},
+			"NestedMap": validation.Keys{
+				nestedExampleConstraints(),
+			},
 		},
+
+		validation.When(
+			len(e.Text) > 32,
+			validation.Constraints{
+				constraints.Required,
+				constraints.MinLength(64),
+			},
+		),
 	}
 }
 
