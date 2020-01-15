@@ -32,7 +32,7 @@ func TestAtLeastNRequired(t *testing.T) {
 		assert.Len(t, violations, 0)
 	})
 
-	t.Run("should return a violation if minimum number of fields are not met", func(t *testing.T) {
+	t.Run("should return a violation if minimum number of fields is not met", func(t *testing.T) {
 		ts1 := testSubject{Field1: "hello"}
 		ts2 := testSubject{Field3: []string{"test"}}
 
