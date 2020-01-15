@@ -27,17 +27,17 @@ func TestAtMostNRequired(t *testing.T) {
 		assert.Empty(t, constraint(validation.NewContext(ts2)))
 	})
 
-	t.Run("should be optional (i.e. only applied if value is not empty)", func(t *testing.T) {
-		violations := AtMostNRequired(1, "Field1", "Field2")(validation.NewContext((*testSubject)(nil)))
-		assert.Len(t, violations, 0)
-	})
-
 	t.Run("should return a violation if maximum number of fields set is exceeded", func(t *testing.T) {
 		ts1 := testSubject{Field1: "hello", Field2: 123}
 		ts2 := testSubject{Field3: []string{"test"}, Field4: map[string]int{"test": 123}}
 
 		assert.NotEmpty(t, constraint(validation.NewContext(ts1)))
 		assert.NotEmpty(t, constraint(validation.NewContext(ts2)))
+	})
+
+	t.Run("should be optional (i.e. only applied if value is not empty)", func(t *testing.T) {
+		violations := AtMostNRequired(1, "Field1", "Field2")(validation.NewContext((*testSubject)(nil)))
+		assert.Len(t, violations, 0)
 	})
 
 	t.Run("should return the fields that at most n of should be set in the violation details", func(t *testing.T) {
@@ -53,11 +53,6 @@ func TestAtMostNRequired(t *testing.T) {
 		}, violations[0].Details)
 	})
 
-	t.Run("should return no violations if the value is nil", func(t *testing.T) {
-		var ts *testSubject
-		assert.Empty(t, constraint(validation.NewContext(ts)))
-	})
-
 	t.Run("should panic if given a value of the wrong type, even if it's empty", func(t *testing.T) {
 		assert.Panics(t, func() { constraint(validation.NewContext("")) })
 		assert.Panics(t, func() { constraint(validation.NewContext(0)) })
@@ -70,7 +65,7 @@ func TestAtMostNRequired(t *testing.T) {
 		assert.Panics(t, func() { AtMostNRequired(-99999, "test")(validation.NewContext(testSubject{})) })
 	})
 
-	t.Run("should panic if number of fields passed to constraint doesn't exceed n", func(t *testing.T) {
+	t.Run("should panic if number of fields given doesn't exceed n", func(t *testing.T) {
 		assert.Panics(t, func() { AtMostNRequired(2, "test")(validation.NewContext(testSubject{})) })
 	})
 }

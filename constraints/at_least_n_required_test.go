@@ -27,17 +27,17 @@ func TestAtLeastNRequired(t *testing.T) {
 		assert.Empty(t, constraint(validation.NewContext(ts2)))
 	})
 
-	t.Run("should be optional (i.e. only applied if value is not empty)", func(t *testing.T) {
-		violations := AtLeastNRequired(1, "Field1", "Field2")(validation.NewContext((*testSubject)(nil)))
-		assert.Len(t, violations, 0)
-	})
-
 	t.Run("should return a violation if minimum number of fields is not met", func(t *testing.T) {
 		ts1 := testSubject{Field1: "hello"}
 		ts2 := testSubject{Field3: []string{"test"}}
 
 		assert.NotEmpty(t, constraint(validation.NewContext(ts1)))
 		assert.NotEmpty(t, constraint(validation.NewContext(ts2)))
+	})
+
+	t.Run("should be optional (i.e. only applied if value is not empty)", func(t *testing.T) {
+		violations := AtLeastNRequired(1, "Field1", "Field2")(validation.NewContext((*testSubject)(nil)))
+		assert.Empty(t, violations)
 	})
 
 	t.Run("should return the fields that at least n of should be set in the violation details", func(t *testing.T) {
@@ -51,11 +51,6 @@ func TestAtLeastNRequired(t *testing.T) {
 			"minimum": 2,
 			"fields":  []string{"Field1", "Field2", "field3", "field4"},
 		}, violations[0].Details)
-	})
-
-	t.Run("should return no violations if the value is nil", func(t *testing.T) {
-		var ts *testSubject
-		assert.Empty(t, constraint(validation.NewContext(ts)))
 	})
 
 	t.Run("should panic if given a value of the wrong type, even if it's empty", func(t *testing.T) {

@@ -16,7 +16,7 @@ func TestMin(t *testing.T) {
 		assert.Empty(t, Min(0)(validation.NewContext(123.456)))
 	})
 
-	t.Run("should return a violation if the maximum value is exceeded", func(t *testing.T) {
+	t.Run("should return a violation if the minimum value is not met", func(t *testing.T) {
 		assert.NotEmpty(t, Min(math.MaxFloat64)(validation.NewContext(123)))
 		assert.NotEmpty(t, Min(math.MaxFloat64)(validation.NewContext(uint(123))))
 		assert.NotEmpty(t, Min(math.MaxFloat64)(validation.NewContext(123.456)))
@@ -27,7 +27,7 @@ func TestMin(t *testing.T) {
 		assert.Len(t, violations, 0)
 	})
 
-	t.Run("should return details about the maximum value with a violation", func(t *testing.T) {
+	t.Run("should return details about the minimum value with a violation", func(t *testing.T) {
 		violations := Min(math.MaxFloat64)(validation.NewContext(123))
 		require.Len(t, violations, 1)
 		assert.Equal(t, map[string]interface{}{

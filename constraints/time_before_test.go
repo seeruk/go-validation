@@ -21,7 +21,7 @@ func TestTimeBefore(t *testing.T) {
 		assert.Len(t, violations, 0)
 	})
 
-	t.Run("should return a violation if the max length is exceeded", func(t *testing.T) {
+	t.Run("should return a violation if the context's time is not before the constraints 'before' time", func(t *testing.T) {
 		violations := TimeBefore(past)(validation.NewContext(present))
 		assert.Len(t, violations, 1)
 	})

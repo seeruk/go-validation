@@ -23,7 +23,7 @@ func TestLength(t *testing.T) {
 
 	t.Run("should be optional (i.e. only applied if value is not empty)", func(t *testing.T) {
 		violations := Length(1)(validation.NewContext([]string{}))
-		assert.Len(t, violations, 0)
+		assert.Empty(t, violations)
 	})
 
 	t.Run("should return details about the expected length with a violation", func(t *testing.T) {

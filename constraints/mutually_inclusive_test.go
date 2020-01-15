@@ -32,17 +32,17 @@ func TestMutuallyInclusive(t *testing.T) {
 		assert.Empty(t, constraint(validation.NewContext(ts1)))
 	})
 
-	t.Run("should be optional (i.e. only applied if value is not empty)", func(t *testing.T) {
-		violations := MutuallyInclusive("Field1", "Field2")(validation.NewContext((*testSubject)(nil)))
-		assert.Len(t, violations, 0)
-	})
-
 	t.Run("should return a violation if all mi fields are not set", func(t *testing.T) {
 		ts1 := testSubject{Field1: "hello", Field2: 1234567}
 		ts2 := testSubject{Field3: []string{"test"}, Field4: map[string]int{"test": 123}}
 
 		assert.NotEmpty(t, constraint(validation.NewContext(ts1)))
 		assert.NotEmpty(t, constraint(validation.NewContext(ts2)))
+	})
+
+	t.Run("should be optional (i.e. only applied if value is not empty)", func(t *testing.T) {
+		violations := MutuallyInclusive("Field1", "Field2")(validation.NewContext((*testSubject)(nil)))
+		assert.Empty(t, violations)
 	})
 
 	t.Run("should return the fields that are mutually inclusive in the violation details", func(t *testing.T) {
@@ -65,11 +65,6 @@ func TestMutuallyInclusive(t *testing.T) {
 		assert.Equal(t, map[string]interface{}{
 			"fields": []string{"Field1", "Field2", "field3", "field4"},
 		}, violations[0].Details)
-	})
-
-	t.Run("should return no violations if the value is nil", func(t *testing.T) {
-		var ts *testSubject
-		assert.Empty(t, constraint(validation.NewContext(ts)))
 	})
 
 	t.Run("should panic if given a value of the wrong type, even if it's empty", func(t *testing.T) {
