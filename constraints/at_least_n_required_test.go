@@ -64,7 +64,7 @@ func TestAtLeastNRequired(t *testing.T) {
 		assert.Panics(t, func() { constraint(validation.NewContext(url.Values{})) })
 	})
 
-	t.Run("should panic if the value if n is 0 or less", func(t *testing.T) {
+	t.Run("should panic if the value of n is 0 or less", func(t *testing.T) {
 		assert.Panics(t, func() { AtLeastNRequired(0, "test")(validation.NewContext(testSubject{})) })
 		assert.Panics(t, func() { AtLeastNRequired(-10, "test")(validation.NewContext(testSubject{})) })
 		assert.Panics(t, func() { AtLeastNRequired(-99999, "test")(validation.NewContext(testSubject{})) })
