@@ -21,6 +21,10 @@ func Validate(value interface{}, constraints ...Constraint) []ConstraintViolatio
 // for more granular configuration provided by the Context type (and means we can avoid creating a
 // Validator struct type to do this).
 func ValidateContext(ctx Context, constraints ...Constraint) []ConstraintViolation {
+	if !ctx.Value().Node.IsValid() {
+		panic("validation: expected a valid type to be given (i.e. valid to Go's reflect library)")
+	}
+
 	return Constraints(constraints).Violations(ctx)
 }
 

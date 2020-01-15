@@ -26,6 +26,8 @@ func main() {
 		time.Date(1800, time.January, 1, 0, 0, 0, 0, time.UTC),
 	}
 
+	example.Nested2 = &Example{}
+
 	violations := validation.Validate(example, exampleConstraints(example))
 
 	var buf bytes.Buffer

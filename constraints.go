@@ -113,7 +113,63 @@ type Lazy func() Constraint
 
 // Violations ...
 func (f Lazy) Violations(ctx Context) []ConstraintViolation {
+	MustBe(UnwrapType(ctx.Value().Node.Type()), reflect.Struct)
 	return f().Violations(ctx)
+}
+
+// LazyDynamic is a Constraint that's extremely similar to Lazy, and fulfils mostly the same
+// purpose, but instead expects a function that has a single argument of the type being validated.
+func LazyDynamic(constraintFn interface{}) Constraint {
+	// TODO: Check constraintFn is not nil?
+	return &lazyDynamic{
+		constraintFn: constraintFn,
+	}
+}
+
+// lazyDynamic is the implementation of the LazyDynamic constraint.
+type lazyDynamic struct {
+	constraintFn interface{}
+}
+
+// constraintType is kept on it's own here because it won't change, we don't need to fetch it every
+// time a constraint is run that uses it.
+var constraintType = reflect.TypeOf((*Constraint)(nil)).Elem()
+
+// Violations ...
+func (ld *lazyDynamic) Violations(ctx Context) []ConstraintViolation {
+	rval := UnwrapValue(ctx.Value().Node)
+	MustBe(UnwrapType(ctx.Value().Node.Type()), reflect.Struct)
+
+	if IsNillable(rval) && rval.IsNil() {
+		return nil
+	}
+
+	rfn := reflect.ValueOf(ld.constraintFn)
+	rfnt := rfn.Type()
+
+	if rfnt.NumIn() != 1 {
+		panic("validation: LazyDynamic expects a function that accepts a single argument of the type being validated (or it's unwrapped value type)")
+	}
+
+	if rfnt.NumOut() != 1 || rfnt.Out(0) != constraintType {
+		panic("validation: LazyDynamic expects a function that returns a Constraint")
+	}
+
+	isContextType := rfnt.In(0) == ctx.Value().Node.Type()
+	isUnwrappedType := rfnt.In(0) == rval.Type()
+
+	if !isContextType && !isUnwrappedType {
+		panic("validation: LazyDynamic expects a function that accepts a single argument of the type being validated (or it's unwrapped value type)")
+	}
+
+	var constraint Constraint
+	if isUnwrappedType {
+		constraint = rfn.Call([]reflect.Value{rval})[0].Interface().(Constraint)
+	} else {
+		constraint = rfn.Call([]reflect.Value{ctx.Value().Node})[0].Interface().(Constraint)
+	}
+
+	return constraint.Violations(ctx)
 }
 
 // Map is a Constraint used to validate a map. This Constraint validates the values in the map, by

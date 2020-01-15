@@ -2,6 +2,7 @@ package validation
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -10,7 +11,7 @@ import (
 func TestConstraints(t *testing.T) {
 	t.Run("should run all constraints", func(t *testing.T) {
 		testConstraint := &TestConstraint{}
-		Validate(nil, Constraints{
+		Validate((*TestSubject)(nil), Constraints{
 			testConstraint,
 			testConstraint,
 			testConstraint,
@@ -22,7 +23,7 @@ func TestConstraints(t *testing.T) {
 
 	t.Run("should return all constraint violations", func(t *testing.T) {
 		testConstraint := &TestConstraint{}
-		violations := Validate(nil, Constraints{
+		violations := Validate((*TestSubject)(nil), Constraints{
 			testConstraint,
 			testConstraint,
 			testConstraint,
@@ -478,7 +479,7 @@ func TestKeys(t *testing.T) {
 }
 
 func TestLazy(t *testing.T) {
-	t.Run("should not execute the underlying constraint upon construction", func(t *testing.T) {
+	t.Run("should not execute the constraint(s) upon construction", func(t *testing.T) {
 		testConstraint := &TestConstraint{}
 
 		_ = Lazy(func() Constraint { return testConstraint })
@@ -486,13 +487,95 @@ func TestLazy(t *testing.T) {
 		assert.Equal(t, 0, testConstraint.Calls)
 	})
 
-	t.Run("should execute the constraint during validation", func(t *testing.T) {
+	t.Run("should execute the constraint(s) during validation", func(t *testing.T) {
 		testConstraint := &TestConstraint{}
 
-		violations := Validate(nil, Lazy(func() Constraint { return testConstraint }))
+		violations := Validate((*TestSubject)(nil), Lazy(func() Constraint { return testConstraint }))
 
 		assert.Equal(t, 1, testConstraint.Calls)
 		assert.Len(t, violations, 1)
+	})
+}
+
+func TestLazyDynamic(t *testing.T) {
+	t.Run("should not execute the constraint(s) upon construction", func(t *testing.T) {
+		testConstraint := &TestConstraint{}
+
+		_ = LazyDynamic(func(i int) Constraint { return testConstraint })
+
+		assert.Equal(t, 0, testConstraint.Calls)
+	})
+
+	t.Run("should execute the constraint(s) during validation", func(t *testing.T) {
+		testConstraint := &TestConstraint{}
+
+		violations := Validate(&TestSubject{}, LazyDynamic(func(ts TestSubject) Constraint { return testConstraint }))
+
+		assert.Equal(t, 1, testConstraint.Calls)
+		assert.Len(t, violations, 1)
+	})
+
+	t.Run("should not execute the constraint(s) if the value is nil", func(t *testing.T) {
+		testConstraint := &TestConstraint{}
+
+		violations := Validate((*TestSubject)(nil), LazyDynamic(func(ts TestSubject) Constraint { return testConstraint }))
+
+		assert.Equal(t, 0, testConstraint.Calls)
+		assert.Empty(t, violations)
+	})
+
+	t.Run("should panic if the given lazy function does not have exactly 1 argument", func(t *testing.T) {
+		testConstraint := &TestConstraint{}
+
+		assert.Panics(t, func() {
+			Validate(&TestSubject{}, LazyDynamic(func() Constraint { return testConstraint }))
+		})
+
+		assert.Panics(t, func() {
+			Validate(&TestSubject{}, LazyDynamic(func(a1, a2 int) Constraint { return testConstraint }))
+		})
+
+		assert.Panics(t, func() {
+			Validate(&TestSubject{}, LazyDynamic(func(a1, a2, a3 int, a4 string) Constraint { return testConstraint }))
+		})
+	})
+
+	t.Run("should panic if the given lazy function doesn't return a Constraint", func(t *testing.T) {
+		assert.Panics(t, func() {
+			Validate(&TestSubject{}, LazyDynamic(func(ts TestSubject) {}))
+		})
+
+		assert.Panics(t, func() {
+			Validate(&TestSubject{}, LazyDynamic(func(ts TestSubject) int { return 1 }))
+		})
+	})
+
+	t.Run("should panic if the given lazy function doesn't accept either the original value, or the unwrapped value's type", func(t *testing.T) {
+		testConstraint := &TestConstraint{}
+
+		assert.Panics(t, func() {
+			Validate(&TestSubject{}, LazyDynamic(func(t time.Time) Constraint { return testConstraint }))
+		})
+
+		assert.Panics(t, func() {
+			Validate(&TestSubject{}, LazyDynamic(func(t **TestSubject) Constraint { return testConstraint }))
+		})
+	})
+
+	t.Run("should not panic if the given lazy function accepts the original value's type", func(t *testing.T) {
+		testConstraint := &TestConstraint{}
+
+		assert.NotPanics(t, func() {
+			Validate(&TestSubject{}, LazyDynamic(func(t *TestSubject) Constraint { return testConstraint }))
+		})
+	})
+
+	t.Run("should not panic if the given lazy function accepts the unwrapped value's type", func(t *testing.T) {
+		testConstraint := &TestConstraint{}
+
+		assert.NotPanics(t, func() {
+			Validate(&TestSubject{}, LazyDynamic(func(t TestSubject) Constraint { return testConstraint }))
+		})
 	})
 }
 
@@ -602,7 +685,7 @@ func TestMap(t *testing.T) {
 func TestWhen(t *testing.T) {
 	t.Run("should run all constraints when the predicate is true", func(t *testing.T) {
 		testConstraint := &TestConstraint{}
-		Validate(nil, When(true,
+		Validate((*TestSubject)(nil), When(true,
 			testConstraint,
 			testConstraint,
 			testConstraint,
@@ -614,7 +697,7 @@ func TestWhen(t *testing.T) {
 
 	t.Run("should return all constraint violations when the predicate is true", func(t *testing.T) {
 		testConstraint := &TestConstraint{}
-		violations := Validate(nil, When(true,
+		violations := Validate((*TestSubject)(nil), When(true,
 			testConstraint,
 			testConstraint,
 			testConstraint,
@@ -626,7 +709,7 @@ func TestWhen(t *testing.T) {
 
 	t.Run("should not run any constraints when the predicate is false", func(t *testing.T) {
 		testConstraint := &TestConstraint{}
-		Validate(nil, When(false,
+		Validate((*TestSubject)(nil), When(false,
 			testConstraint,
 			testConstraint,
 			testConstraint,
@@ -638,7 +721,7 @@ func TestWhen(t *testing.T) {
 
 	t.Run("should not return any constraint violations when the predicate is false", func(t *testing.T) {
 		testConstraint := &TestConstraint{}
-		violations := Validate(nil, When(false,
+		violations := Validate((*TestSubject)(nil), When(false,
 			testConstraint,
 			testConstraint,
 			testConstraint,
@@ -652,7 +735,7 @@ func TestWhen(t *testing.T) {
 func TestWhenFn(t *testing.T) {
 	t.Run("should run all constraints when the predicate function returns true", func(t *testing.T) {
 		testConstraint := &TestConstraint{}
-		Validate(nil, WhenFn(func() bool { return true },
+		Validate((*TestSubject)(nil), WhenFn(func() bool { return true },
 			testConstraint,
 			testConstraint,
 			testConstraint,
@@ -664,7 +747,7 @@ func TestWhenFn(t *testing.T) {
 
 	t.Run("should return all constraint violations when the predicate function returns true", func(t *testing.T) {
 		testConstraint := &TestConstraint{}
-		violations := Validate(nil, WhenFn(func() bool { return true },
+		violations := Validate((*TestSubject)(nil), WhenFn(func() bool { return true },
 			testConstraint,
 			testConstraint,
 			testConstraint,
@@ -676,7 +759,7 @@ func TestWhenFn(t *testing.T) {
 
 	t.Run("should not run any constraints when the predicate function returns false", func(t *testing.T) {
 		testConstraint := &TestConstraint{}
-		Validate(nil, WhenFn(func() bool { return false },
+		Validate((*TestSubject)(nil), WhenFn(func() bool { return false },
 			testConstraint,
 			testConstraint,
 			testConstraint,
@@ -688,7 +771,7 @@ func TestWhenFn(t *testing.T) {
 
 	t.Run("should not return any constraint violations when the predicate function returns false", func(t *testing.T) {
 		testConstraint := &TestConstraint{}
-		violations := Validate(nil, WhenFn(func() bool { return false },
+		violations := Validate((*TestSubject)(nil), WhenFn(func() bool { return false },
 			testConstraint,
 			testConstraint,
 			testConstraint,
@@ -697,6 +780,10 @@ func TestWhenFn(t *testing.T) {
 
 		assert.Len(t, violations, 0)
 	})
+}
+
+type TestSubject struct {
+	Text string `validation:"text"`
 }
 
 type TestConstraint struct {

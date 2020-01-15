@@ -31,6 +31,7 @@ type Example struct {
 	Time      time.Time                  `json:"time" validation:"time"`
 	Times     []time.Time                `json:"times"`
 	Nested    *NestedExample             `json:"nested" validation:"nested"`
+	Nested2   *Example                   `json:"nested2" validation:"nested2"`
 	Nesteds   []*NestedExample           `json:"nesteds"`
 	NestedMap map[NestedExample]struct{} `json:"nested_map" validation:"nested_map"`
 }
@@ -99,6 +100,7 @@ func exampleConstraints(e Example) validation.Constraint {
 				constraints.Required,
 				nestedExampleConstraints(),
 			},
+			"Nested2": validation.LazyDynamic(exampleConstraints),
 			"Nesteds": validation.Elements{
 				nestedExampleConstraints(),
 			},

@@ -35,6 +35,12 @@ func TestValidateContext(t *testing.T) {
 		violations := validation.ValidateContext(validation.NewContext(1), constraints.Required)
 		assert.Len(t, violations, 0)
 	})
+
+	t.Run("should panic if given an 'invalid' value (i.e. according to Go's reflect library)", func(t *testing.T) {
+		assert.Panics(t, func() {
+			validation.ValidateContext(validation.NewContext(nil), constraints.Required)
+		})
+	})
 }
 
 func TestConstraintFunc_Violations(t *testing.T) {
