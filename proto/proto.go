@@ -26,7 +26,11 @@ func MapToStruct(in map[string]interface{}) *types.Struct {
 func toValue(v interface{}) *types.Value {
 	switch v := v.(type) {
 	case nil:
-		return nil
+		return &types.Value{
+			Kind: &types.Value_NullValue{
+				NullValue: types.NullValue_NULL_VALUE,
+			},
+		}
 	case bool:
 		return &types.Value{
 			Kind: &types.Value_BoolValue{
@@ -40,6 +44,12 @@ func toValue(v interface{}) *types.Value {
 			},
 		}
 	case int8:
+		return &types.Value{
+			Kind: &types.Value_NumberValue{
+				NumberValue: float64(v),
+			},
+		}
+	case int16:
 		return &types.Value{
 			Kind: &types.Value_NumberValue{
 				NumberValue: float64(v),
@@ -64,6 +74,12 @@ func toValue(v interface{}) *types.Value {
 			},
 		}
 	case uint8:
+		return &types.Value{
+			Kind: &types.Value_NumberValue{
+				NumberValue: float64(v),
+			},
+		}
+	case uint16:
 		return &types.Value{
 			Kind: &types.Value_NumberValue{
 				NumberValue: float64(v),
