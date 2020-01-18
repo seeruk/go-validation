@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
+
+	"github.com/seeruk/go-validation/proto"
+	"github.com/seeruk/go-validation/validationpb"
 )
 
 // DefaultNameStructTag is the default struct tag used to override the name of struct fields in the
@@ -231,4 +234,26 @@ func UnwrapValue(val reflect.Value) reflect.Value {
 	}
 
 	return val
+}
+
+// ConstraintViolationsToProto converts a slice of ConstraintViolations into a slice of the ProtoBuf
+// representation of those ConstraintViolations, making them ready to use for example in a gRPC
+// service in a similar way to how ConstraintViolation can already be used in JSON web services.
+func ConstraintViolationsToProto(violations []ConstraintViolation) []validationpb.ConstraintViolation {
+	protoViolations := make([]validationpb.ConstraintViolation, 0, len(violations))
+
+	for _, violation := range violations {
+		protoViolation := validationpb.ConstraintViolation{
+			Path: violation.Path,
+			// Currently these enum values are both just numbers, and both start at the same number,
+			// and the values are in the same order.
+			PathKind: validationpb.PathKind(violation.PathKind),
+			Message:  violation.Message,
+			Details:  proto.MapToStruct(violation.Details),
+		}
+
+		protoViolations = append(protoViolations, protoViolation)
+	}
+
+	return protoViolations
 }

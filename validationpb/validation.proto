@@ -1,0 +1,24 @@
+syntax = "proto3";
+package seeruk.validation;
+
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "google/protobuf/struct.proto";
+
+option go_package = "github.com/seeruk/go-validation/validationpb;validationpb";
+option (gogoproto.goproto_registration) = true;
+
+// ConstraintViolation is a ProtoBuf representation of the the ConstraintViolation type, intended to
+// allow ConstraintViolations to be used with gRPC more easily.
+message ConstraintViolation {
+    string path = 1;
+    PathKind path_kind = 2;
+    string message = 3;
+    google.protobuf.Struct details = 4;
+}
+
+// PathKind is a ProtoBuf representation of the PathKind type, enumerating the different possible
+// path kinds (i.e. denoting what the constraint violation is referring to at the given path).
+enum PathKind {
+    VALUE = 0;
+    KEY = 1;
+}

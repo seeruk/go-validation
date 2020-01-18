@@ -7,6 +7,7 @@ import (
 	"math"
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/seeruk/go-validation"
 )
 
@@ -23,7 +24,7 @@ func main() {
 	example.Adults = 2
 	example.Children = 4
 	example.Times = []time.Time{
-		time.Date(1800, time.January, 1, 0, 0, 0, 0, time.UTC),
+		time.Date(2020, time.January, 1, 0, 0, 0, 0, time.UTC),
 	}
 
 	example.Nested2 = &Example{}
@@ -37,4 +38,8 @@ func main() {
 	encoder.Encode(violations)
 
 	fmt.Println(buf.String())
+
+	protoViolations := validation.ConstraintViolationsToProto(violations)
+
+	spew.Dump(protoViolations)
 }
