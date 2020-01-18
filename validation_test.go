@@ -9,6 +9,8 @@ import (
 
 	"github.com/seeruk/go-validation"
 	"github.com/seeruk/go-validation/constraints"
+	"github.com/seeruk/go-validation/proto"
+	"github.com/seeruk/go-validation/validationpb"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -294,6 +296,46 @@ func TestUnwrapValue(t *testing.T) {
 		var foo ***string
 
 		assert.Equal(t, foo, validation.UnwrapValue(reflect.ValueOf(foo)).Interface())
+	})
+}
+
+func TestConstraintViolationsToProto(t *testing.T) {
+	t.Run("should return the same number of output violations as input violations", func(t *testing.T) {
+		violations := []validation.ConstraintViolation{
+			{Path: ".test", Message: "violation 1"},
+			{Path: ".test", Message: "violation 2"},
+			{Path: ".test", Message: "violation 3"},
+			{Path: ".test", Message: "violation 4"},
+		}
+
+		assert.Len(t, validation.ConstraintViolationsToProto(violations), len(violations))
+	})
+
+	t.Run("should return the same information in resulting proto violations", func(t *testing.T) {
+		path := ".test.violation.[0].to.proto"
+		pathKind := validation.PathKindKey
+		message := "test violation"
+		details := map[string]interface{}{
+			"bool":   true,
+			"int":    123,
+			"float":  123.456,
+			"string": "Hello, World!",
+			"nested": map[string]interface{}{
+				"string": "nested string",
+			},
+		}
+
+		violations := []validation.ConstraintViolation{
+			{Path: path, PathKind: pathKind, Message: message, Details: details},
+		}
+
+		protoViolations := validation.ConstraintViolationsToProto(violations)
+
+		require.Len(t, protoViolations, 1)
+		assert.Equal(t, path, protoViolations[0].Path)
+		assert.Equal(t, validationpb.PathKind(pathKind), protoViolations[0].PathKind)
+		assert.Equal(t, message, protoViolations[0].Message)
+		assert.Equal(t, proto.MapToStruct(details), protoViolations[0].Details)
 	})
 }
 
