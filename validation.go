@@ -228,8 +228,10 @@ func UnwrapValue(val reflect.Value) reflect.Value {
 		return val
 	}
 
-	// Unwrap any pointer values, we'll only get here if it's not nil.
-	if val.Kind() == reflect.Ptr {
+	switch val.Kind() {
+	case reflect.Interface, reflect.Ptr:
+		// Unwrap any pointer values, we'll only get here if it's not nil.
+		// Also handle interface values, which we might get from dynamic structures.
 		return UnwrapValue(val.Elem())
 	}
 
