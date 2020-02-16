@@ -88,14 +88,15 @@ type ConstraintViolation struct {
 
 // Context contains useful information for a Constraint, including the value(s) being validated.
 type Context struct {
-	PathKind  PathKind
-	StructTag string
-	Values    []Value
+	PathKind    PathKind
+	StrictTypes bool // Enables panicking if the wrong type is passed to a constraint
+	StructTag   string
+	Values      []Value
 }
 
 // NewContext returns a new Context, with a Value created for the given interface{} value.
 func NewContext(value interface{}) Context {
-	ctx := Context{StructTag: DefaultNameStructTag}
+	ctx := Context{StrictTypes: true, StructTag: DefaultNameStructTag}
 	return ctx.WithValue("", reflect.ValueOf(value))
 }
 
@@ -209,6 +210,31 @@ func MustBe(typ reflect.Type, kinds ...reflect.Kind) {
 		strings.Join(kindNames, ", "),
 		typ.Kind(),
 	))
+}
+
+// ShouldBe is the non-panicking alternative to MustBe. Instead of panicking it returns a slice of
+// ConstraintViolation which can be directly returned from a Constraint.
+func ShouldBe(ctx Context, typ reflect.Type, kinds ...reflect.Kind) []ConstraintViolation {
+	if len(kinds) == 0 {
+		panic("validation: at least one kind must be given to MustBe")
+	}
+
+	for _, kind := range kinds {
+		if typ.Kind() == kind {
+			return nil
+		}
+	}
+
+	var kindNames []string
+	for _, kind := range kinds {
+		kindNames = append(kindNames, kind.String())
+	}
+
+	return []ConstraintViolation{
+		ctx.Violation("value should be of an allowed type", map[string]interface{}{
+			"allowed_types": kindNames,
+		}),
+	}
 }
 
 // UnwrapType takes the given reflect.Type, and if it's a pointer gets the pointer element's type.

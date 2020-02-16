@@ -11,7 +11,16 @@ import (
 func Regexp(pattern *regexp.Regexp) validation.ConstraintFunc {
 	return func(ctx validation.Context) []validation.ConstraintViolation {
 		rval := validation.UnwrapValue(ctx.Value().Node)
-		validation.MustBe(validation.UnwrapType(rval.Type()), reflect.String)
+		rtyp := validation.UnwrapType(rval.Type())
+
+		if ctx.StrictTypes {
+			validation.MustBe(rtyp, reflect.String)
+		} else {
+			violations := validation.ShouldBe(ctx, rtyp, reflect.String)
+			if len(violations) > 0 {
+				return violations
+			}
+		}
 
 		if validation.IsEmpty(rval) {
 			return nil

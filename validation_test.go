@@ -260,6 +260,26 @@ func TestMustBe(t *testing.T) {
 	})
 }
 
+func TestShouldBe(t *testing.T) {
+	ctx := validation.NewContext("test")
+
+	t.Run("should return no violations if the given type is of one of the given kinds", func(t *testing.T) {
+		violations := validation.ShouldBe(ctx, reflect.TypeOf("test"), reflect.Array, reflect.String)
+		assert.Empty(t, violations)
+	})
+
+	t.Run("should return violations if the given type is not one of the given kinds", func(t *testing.T) {
+		violations := validation.ShouldBe(ctx, reflect.TypeOf("test"), reflect.Array, reflect.Map)
+		assert.Len(t, violations, 1)
+	})
+
+	t.Run("should panic if no kinds are given", func(t *testing.T) {
+		assert.Panics(t, func() {
+			validation.ShouldBe(ctx, reflect.TypeOf("hello"))
+		})
+	})
+}
+
 func TestUnwrapType(t *testing.T) {
 	t.Run("should find the root, non-pointer type of the given type", func(t *testing.T) {
 		var wrapped ****string
