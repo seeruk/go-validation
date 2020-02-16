@@ -216,7 +216,7 @@ func MustBe(typ reflect.Type, kinds ...reflect.Kind) {
 // ConstraintViolation which can be directly returned from a Constraint.
 func ShouldBe(ctx Context, typ reflect.Type, kinds ...reflect.Kind) []ConstraintViolation {
 	if len(kinds) == 0 {
-		panic("validation: at least one kind must be given to MustBe")
+		panic("validation: at least one kind must be given to ShouldBe")
 	}
 
 	for _, kind := range kinds {
@@ -231,7 +231,7 @@ func ShouldBe(ctx Context, typ reflect.Type, kinds ...reflect.Kind) []Constraint
 	}
 
 	return []ConstraintViolation{
-		ctx.Violation("value should be of an allowed kinds", map[string]interface{}{
+		ctx.Violation("value should be of one of the allowed kinds", map[string]interface{}{
 			"allowed_kinds": kindNames,
 		}),
 	}
