@@ -735,7 +735,7 @@ func TestWhen(t *testing.T) {
 func TestWhenFn(t *testing.T) {
 	t.Run("should run all constraints when the predicate function returns true", func(t *testing.T) {
 		testConstraint := &TestConstraint{}
-		Validate((*TestSubject)(nil), WhenFn(func() bool { return true },
+		Validate((*TestSubject)(nil), WhenFn(func(ctx Context) bool { return true },
 			testConstraint,
 			testConstraint,
 			testConstraint,
@@ -747,7 +747,7 @@ func TestWhenFn(t *testing.T) {
 
 	t.Run("should return all constraint violations when the predicate function returns true", func(t *testing.T) {
 		testConstraint := &TestConstraint{}
-		violations := Validate((*TestSubject)(nil), WhenFn(func() bool { return true },
+		violations := Validate((*TestSubject)(nil), WhenFn(func(ctx Context) bool { return true },
 			testConstraint,
 			testConstraint,
 			testConstraint,
@@ -759,7 +759,7 @@ func TestWhenFn(t *testing.T) {
 
 	t.Run("should not run any constraints when the predicate function returns false", func(t *testing.T) {
 		testConstraint := &TestConstraint{}
-		Validate((*TestSubject)(nil), WhenFn(func() bool { return false },
+		Validate((*TestSubject)(nil), WhenFn(func(ctx Context) bool { return false },
 			testConstraint,
 			testConstraint,
 			testConstraint,
@@ -771,7 +771,7 @@ func TestWhenFn(t *testing.T) {
 
 	t.Run("should not return any constraint violations when the predicate function returns false", func(t *testing.T) {
 		testConstraint := &TestConstraint{}
-		violations := Validate((*TestSubject)(nil), WhenFn(func() bool { return false },
+		violations := Validate((*TestSubject)(nil), WhenFn(func(ctx Context) bool { return false },
 			testConstraint,
 			testConstraint,
 			testConstraint,

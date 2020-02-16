@@ -218,10 +218,10 @@ func When(predicate bool, constraints ...Constraint) ConstraintFunc {
 // WhenFn lazily conditionally runs some constraints. The predicate function is called during the
 // validation process. If you need an even more dynamic approach, you can also build up constraints
 // programmatically and use the value being validated to build the constraints.
-func WhenFn(predicateFn func() bool, constraints ...Constraint) ConstraintFunc {
+func WhenFn(predicateFn func(ctx Context) bool, constraints ...Constraint) ConstraintFunc {
 	return func(ctx Context) []ConstraintViolation {
 		var violations []ConstraintViolation
-		if predicateFn() {
+		if predicateFn(ctx) {
 			for _, c := range constraints {
 				violations = append(violations, c.Violations(ctx)...)
 			}
