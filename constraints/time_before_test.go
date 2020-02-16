@@ -51,4 +51,17 @@ func TestTimeBefore(t *testing.T) {
 		assert.Panics(t, func() { TimeBefore(future)(validation.NewContext(url.Values{})) })
 		assert.Panics(t, func() { TimeBefore(future)(validation.NewContext(regexp.MustCompile("^test"))) })
 	})
+
+	t.Run("should return violations if given a value of the wrong type, even if it's empty, if strict types is false", func(t *testing.T) {
+		ctx1 := validation.NewContext("")
+		ctx1.StrictTypes = false
+		ctx2 := validation.NewContext(0)
+		ctx2.StrictTypes = false
+		ctx3 := validation.NewContext(url.Values{})
+		ctx3.StrictTypes = false
+
+		assert.Len(t, TimeBefore(future)(ctx1), 1)
+		assert.Len(t, TimeBefore(future)(ctx2), 1)
+		assert.Len(t, TimeBefore(future)(ctx3), 1)
+	})
 }

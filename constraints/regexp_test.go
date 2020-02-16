@@ -44,4 +44,11 @@ func TestRegexp(t *testing.T) {
 	t.Run("should panic if given a value of the wrong type, even if it's empty", func(t *testing.T) {
 		assert.Panics(t, func() { Regexp(pattern)(validation.NewContext(0)) })
 	})
+
+	t.Run("should return violations if given a value of the wrong type, even if it's empty, if strict types is false", func(t *testing.T) {
+		ctx := validation.NewContext(123)
+		ctx.StrictTypes = false
+
+		assert.Len(t, Regexp(pattern)(ctx), 1)
+	})
 }

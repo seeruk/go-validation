@@ -59,6 +59,19 @@ func TestExactlyNRequired(t *testing.T) {
 		assert.Panics(t, func() { constraint(validation.NewContext(url.Values{})) })
 	})
 
+	t.Run("should return violations if given a value of the wrong type, even if it's empty, if strict types is false", func(t *testing.T) {
+		ctx1 := validation.NewContext("")
+		ctx1.StrictTypes = false
+		ctx2 := validation.NewContext(0)
+		ctx2.StrictTypes = false
+		ctx3 := validation.NewContext(url.Values{})
+		ctx3.StrictTypes = false
+
+		assert.Len(t, constraint(ctx1), 1)
+		assert.Len(t, constraint(ctx2), 1)
+		assert.Len(t, constraint(ctx3), 1)
+	})
+
 	t.Run("should panic if the value if n is 0 or less", func(t *testing.T) {
 		assert.Panics(t, func() { ExactlyNRequired(0, "test")(validation.NewContext(testSubject{})) })
 		assert.Panics(t, func() { ExactlyNRequired(-10, "test")(validation.NewContext(testSubject{})) })

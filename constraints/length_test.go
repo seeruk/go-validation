@@ -58,4 +58,11 @@ func TestLength(t *testing.T) {
 		assert.Panics(t, func() { Length(1)(validation.NewContext(123)) })
 		assert.Panics(t, func() { Length(1)(validation.NewContext(0)) })
 	})
+
+	t.Run("should return violations if given a value of the wrong type, even if it's empty, if strict types is false", func(t *testing.T) {
+		ctx := validation.NewContext(123)
+		ctx.StrictTypes = false
+
+		assert.Len(t, Length(1)(ctx), 1)
+	})
 }
