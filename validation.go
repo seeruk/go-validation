@@ -231,8 +231,8 @@ func ShouldBe(ctx Context, typ reflect.Type, kinds ...reflect.Kind) []Constraint
 	}
 
 	return []ConstraintViolation{
-		ctx.Violation("value should be of an allowed type", map[string]interface{}{
-			"allowed_types": kindNames,
+		ctx.Violation("value should be of an allowed kinds", map[string]interface{}{
+			"allowed_kinds": kindNames,
 		}),
 	}
 }
