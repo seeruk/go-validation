@@ -25,7 +25,18 @@ type Elements []Constraint
 // Violations ...
 func (e Elements) Violations(ctx Context) []ConstraintViolation {
 	rval := UnwrapValue(ctx.Value().Node)
-	MustBe(UnwrapType(rval.Type()), reflect.Array, reflect.Map, reflect.Slice)
+	rtyp := UnwrapType(rval.Type())
+
+	allowed := []reflect.Kind{reflect.Array, reflect.Map, reflect.Slice}
+
+	if ctx.StrictTypes {
+		MustBe(rtyp, allowed...)
+	} else {
+		violations := ShouldBe(ctx, rtyp, allowed...)
+		if len(violations) > 0 {
+			return violations
+		}
+	}
 
 	var violations []ConstraintViolation
 	if rval.IsZero() {
@@ -65,7 +76,15 @@ type Fields map[string]Constraint
 func (f Fields) Violations(ctx Context) []ConstraintViolation {
 	rval := UnwrapValue(ctx.Value().Node)
 	rtyp := UnwrapType(rval.Type())
-	MustBe(rtyp, reflect.Struct)
+
+	if ctx.StrictTypes {
+		MustBe(rtyp, reflect.Struct)
+	} else {
+		violations := ShouldBe(ctx, rtyp, reflect.Struct)
+		if len(violations) > 0 {
+			return violations
+		}
+	}
 
 	var violations []ConstraintViolation
 	if IsNillable(rval) && rval.IsNil() {
@@ -86,7 +105,16 @@ type Keys []Constraint
 // Violations ...
 func (k Keys) Violations(ctx Context) []ConstraintViolation {
 	rval := UnwrapValue(ctx.Value().Node)
-	MustBe(UnwrapType(rval.Type()), reflect.Map)
+	rtyp := UnwrapType(rval.Type())
+
+	if ctx.StrictTypes {
+		MustBe(rtyp, reflect.Map)
+	} else {
+		violations := ShouldBe(ctx, rtyp, reflect.Map)
+		if len(violations) > 0 {
+			return violations
+		}
+	}
 
 	var violations []ConstraintViolation
 	if rval.IsNil() {
@@ -113,7 +141,18 @@ type Lazy func() Constraint
 
 // Violations ...
 func (f Lazy) Violations(ctx Context) []ConstraintViolation {
-	MustBe(UnwrapType(ctx.Value().Node.Type()), reflect.Struct)
+	rval := UnwrapValue(ctx.Value().Node)
+	rtyp := UnwrapType(rval.Type())
+
+	if ctx.StrictTypes {
+		MustBe(rtyp, reflect.Struct)
+	} else {
+		violations := ShouldBe(ctx, rtyp, reflect.Struct)
+		if len(violations) > 0 {
+			return violations
+		}
+	}
+
 	return f().Violations(ctx)
 }
 
@@ -138,7 +177,16 @@ var constraintType = reflect.TypeOf((*Constraint)(nil)).Elem()
 // Violations ...
 func (ld *lazyDynamic) Violations(ctx Context) []ConstraintViolation {
 	rval := UnwrapValue(ctx.Value().Node)
-	MustBe(UnwrapType(ctx.Value().Node.Type()), reflect.Struct)
+	rtyp := UnwrapType(rval.Type())
+
+	if ctx.StrictTypes {
+		MustBe(rtyp, reflect.Struct)
+	} else {
+		violations := ShouldBe(ctx, rtyp, reflect.Struct)
+		if len(violations) > 0 {
+			return violations
+		}
+	}
 
 	if IsNillable(rval) && rval.IsNil() {
 		return nil
@@ -180,7 +228,16 @@ type Map map[interface{}]Constraint
 // Violations ...
 func (m Map) Violations(ctx Context) []ConstraintViolation {
 	rval := UnwrapValue(ctx.Value().Node)
-	MustBe(UnwrapType(rval.Type()), reflect.Map)
+	rtyp := UnwrapType(rval.Type())
+
+	if ctx.StrictTypes {
+		MustBe(rtyp, reflect.Map)
+	} else {
+		violations := ShouldBe(ctx, rtyp, reflect.Map)
+		if len(violations) > 0 {
+			return violations
+		}
+	}
 
 	var violations []ConstraintViolation
 	if rval.IsNil() { // Maps, or pointers to maps can be nil.
