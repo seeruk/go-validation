@@ -271,22 +271,8 @@ func TestElements(t *testing.T) {
 		})
 	})
 
-	t.Run("should panic if the given type is not allowed, and strict types is true", func(t *testing.T) {
+	t.Run("should return violations if the given type is not allowed, and the value is not empty", func(t *testing.T) {
 		vctx := NewContext("hello world")
-		vctx.StrictTypes = true
-
-		testConstraint := &TestConstraint{}
-
-		assert.Panics(t, func() {
-			_ = ValidateContext(vctx, Elements{
-				testConstraint,
-			})
-		})
-	})
-
-	t.Run("should return violations if the given type is not allowed, and strict types is false", func(t *testing.T) {
-		vctx := NewContext("hello world")
-		vctx.StrictTypes = false
 
 		testConstraint := &TestConstraint{}
 
@@ -387,22 +373,8 @@ func TestFields(t *testing.T) {
 		assert.Equal(t, ".Foo", violations[0].Path)
 	})
 
-	t.Run("should panic if the given type is not allowed, and strict types is true", func(t *testing.T) {
+	t.Run("should return violations if the given type is not allowed, and the value is not empty", func(t *testing.T) {
 		vctx := NewContext("hello world")
-		vctx.StrictTypes = true
-
-		testConstraint := &TestConstraint{}
-
-		assert.Panics(t, func() {
-			_ = ValidateContext(vctx, Fields{
-				"Foo": testConstraint,
-			})
-		})
-	})
-
-	t.Run("should return violations if the given type is not allowed, and strict types is false", func(t *testing.T) {
-		vctx := NewContext("hello world")
-		vctx.StrictTypes = false
 
 		testConstraint := &TestConstraint{}
 
@@ -529,22 +501,8 @@ func TestKeys(t *testing.T) {
 		assert.Equal(t, ".nil", violations[0].Path)
 	})
 
-	t.Run("should panic if the given type is not allowed, and strict types is true", func(t *testing.T) {
+	t.Run("should return violations if the given type is not allowed, and the value is not empty", func(t *testing.T) {
 		vctx := NewContext("hello world")
-		vctx.StrictTypes = true
-
-		testConstraint := &TestConstraint{}
-
-		assert.Panics(t, func() {
-			_ = ValidateContext(vctx, Keys{
-				testConstraint,
-			})
-		})
-	})
-
-	t.Run("should return violations if the given type is not allowed, and strict types is false", func(t *testing.T) {
-		vctx := NewContext("hello world")
-		vctx.StrictTypes = false
 
 		testConstraint := &TestConstraint{}
 
@@ -574,20 +532,8 @@ func TestLazy(t *testing.T) {
 		assert.Len(t, violations, 1)
 	})
 
-	t.Run("should panic if the given type is not allowed, and strict types is true", func(t *testing.T) {
+	t.Run("should return violations if the given type is not allowed, and the value is not empty", func(t *testing.T) {
 		vctx := NewContext("hello world")
-		vctx.StrictTypes = true
-
-		testConstraint := &TestConstraint{}
-
-		assert.Panics(t, func() {
-			_ = ValidateContext(vctx, Lazy(func() Constraint { return testConstraint }))
-		})
-	})
-
-	t.Run("should return violations if the given type is not allowed, and strict types is false", func(t *testing.T) {
-		vctx := NewContext("hello world")
-		vctx.StrictTypes = false
 
 		testConstraint := &TestConstraint{}
 
@@ -678,20 +624,8 @@ func TestLazyDynamic(t *testing.T) {
 		})
 	})
 
-	t.Run("should panic if the given type is not allowed, and strict types is true", func(t *testing.T) {
+	t.Run("should return violations if the given type is not allowed, and the value is not empty", func(t *testing.T) {
 		vctx := NewContext("hello world")
-		vctx.StrictTypes = true
-
-		testConstraint := &TestConstraint{}
-
-		assert.Panics(t, func() {
-			_ = ValidateContext(vctx, LazyDynamic(func(t TestSubject) Constraint { return testConstraint }))
-		})
-	})
-
-	t.Run("should return violations if the given type is not allowed, and strict types is false", func(t *testing.T) {
-		vctx := NewContext("hello world")
-		vctx.StrictTypes = false
 
 		testConstraint := &TestConstraint{}
 
@@ -803,22 +737,8 @@ func TestMap(t *testing.T) {
 		assert.Equal(t, ".Foo", violations[0].Path)
 	})
 
-	t.Run("should panic if the given type is not allowed, and strict types is true", func(t *testing.T) {
+	t.Run("should return violations if the given type is not allowed, and the value is not empty", func(t *testing.T) {
 		vctx := NewContext("hello world")
-		vctx.StrictTypes = true
-
-		testConstraint := &TestConstraint{}
-
-		assert.Panics(t, func() {
-			_ = ValidateContext(vctx, Map{
-				"Foo": testConstraint,
-			})
-		})
-	})
-
-	t.Run("should return violations if the given type is not allowed, and strict types is false", func(t *testing.T) {
-		vctx := NewContext("hello world")
-		vctx.StrictTypes = false
 
 		testConstraint := &TestConstraint{}
 

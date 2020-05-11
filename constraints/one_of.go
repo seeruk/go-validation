@@ -9,7 +9,7 @@ import (
 // OneOf ...
 func OneOf(allowed ...interface{}) validation.ConstraintFunc {
 	if len(allowed) < 2 {
-		panic("constraint: OneOf must be given at least 2 allowed values")
+		panic("constraints: OneOf must be given at least 2 allowed values")
 	}
 
 	return func(ctx validation.Context) []validation.ConstraintViolation {

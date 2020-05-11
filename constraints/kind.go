@@ -10,6 +10,10 @@ import (
 func Kind(allowed ...reflect.Kind) validation.ConstraintFunc {
 	return func(ctx validation.Context) []validation.ConstraintViolation {
 		rval := validation.UnwrapValue(ctx.Value().Node)
+		if validation.IsEmpty(rval) {
+			return nil
+		}
+
 		rtyp := validation.UnwrapType(rval.Type())
 
 		violations := validation.ShouldBe(ctx, rtyp, allowed...)

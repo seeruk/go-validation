@@ -60,15 +60,8 @@ func TestMax(t *testing.T) {
 		})
 	})
 
-	t.Run("should panic if given a value of the wrong type, even if it's empty", func(t *testing.T) {
-		assert.Panics(t, func() { Max(1)(validation.NewContext("test")) })
-		assert.Panics(t, func() { Max(1)(validation.NewContext("")) })
-	})
-
-	t.Run("should return violations if given a value of the wrong type, even if it's empty, if strict types is false", func(t *testing.T) {
+	t.Run("should return violations if given a value of the wrong type, and the value is not empty", func(t *testing.T) {
 		ctx := validation.NewContext("hello world")
-		ctx.StrictTypes = false
-
 		assert.Len(t, Max(1)(ctx), 1)
 	})
 }

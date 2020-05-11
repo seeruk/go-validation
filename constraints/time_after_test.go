@@ -2,7 +2,6 @@ package constraints
 
 import (
 	"net/url"
-	"regexp"
 	"testing"
 	"time"
 
@@ -45,20 +44,10 @@ func TestTimeAfter(t *testing.T) {
 		})
 	})
 
-	t.Run("should panic if given a value of the wrong type, even if it's empty", func(t *testing.T) {
-		assert.Panics(t, func() { TimeAfter(past)(validation.NewContext("test")) })
-		assert.Panics(t, func() { TimeAfter(past)(validation.NewContext(123)) })
-		assert.Panics(t, func() { TimeAfter(past)(validation.NewContext(url.Values{})) })
-		assert.Panics(t, func() { TimeAfter(past)(validation.NewContext(regexp.MustCompile("^test"))) })
-	})
-
-	t.Run("should return violations if given a value of the wrong type, even if it's empty, if strict types is false", func(t *testing.T) {
-		ctx1 := validation.NewContext("")
-		ctx1.StrictTypes = false
-		ctx2 := validation.NewContext(0)
-		ctx2.StrictTypes = false
-		ctx3 := validation.NewContext(url.Values{})
-		ctx3.StrictTypes = false
+	t.Run("should return violations if given a value of the wrong type, and the value is not empty", func(t *testing.T) {
+		ctx1 := validation.NewContext("hi")
+		ctx2 := validation.NewContext(123)
+		ctx3 := validation.NewContext(url.Values{"not": []string{"empty"}})
 
 		assert.Len(t, TimeAfter(past)(ctx1), 1)
 		assert.Len(t, TimeAfter(past)(ctx2), 1)

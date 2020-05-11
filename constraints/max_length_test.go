@@ -35,34 +35,8 @@ func TestMaxLength(t *testing.T) {
 		}, violations[0].Details)
 	})
 
-	t.Run("should not panic if given values of any type 'len' can be called on", func(t *testing.T) {
-		assert.NotPanics(t, func() {
-			MaxLength(1)(validation.NewContext([1]int{1}))
-			MaxLength(1)(validation.NewContext(make(chan struct{})))
-			MaxLength(1)(validation.NewContext(map[string]interface{}{}))
-			MaxLength(1)(validation.NewContext([]string{}))
-			MaxLength(1)(validation.NewContext(""))
-		})
-	})
-
-	t.Run("should not panic if given a nil pointer to a type 'len' can be called on", func(t *testing.T) {
-		assert.NotPanics(t, func() {
-			MaxLength(1)(validation.NewContext((*chan struct{})(nil)))
-			MaxLength(1)(validation.NewContext((*map[string]string)(nil)))
-			MaxLength(1)(validation.NewContext((*[]string)(nil)))
-			MaxLength(1)(validation.NewContext((*string)(nil)))
-		})
-	})
-
-	t.Run("should panic if given a value of the wrong type, even if it's empty", func(t *testing.T) {
-		assert.Panics(t, func() { MaxLength(1)(validation.NewContext(123)) })
-		assert.Panics(t, func() { MaxLength(1)(validation.NewContext(0)) })
-	})
-
-	t.Run("should return violations if given a value of the wrong type, even if it's empty, if strict types is false", func(t *testing.T) {
+	t.Run("should return violations if given a value of the wrong type, if not empty", func(t *testing.T) {
 		ctx := validation.NewContext(123)
-		ctx.StrictTypes = false
-
 		assert.Len(t, MaxLength(1)(ctx), 1)
 	})
 }

@@ -52,9 +52,8 @@ func exampleConstraints(e Example) validation.Constraint {
 			"Text": validation.Constraints{
 				constraints.Required,
 				constraints.Regexp(patternGreeting),
-				constraints.MaxLength(14),
 				constraints.Length(14),
-				constraints.OneOf("Hello, World!", "Hello, SeerUK!", "Hello, GitHub!"),
+				constraints.OneOf("Hello, Planet!", "Hello, SeerUK!", "Hello, GitHub!"),
 			},
 			"TextMap": validation.Constraints{
 				constraints.Required,

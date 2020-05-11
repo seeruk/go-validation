@@ -88,15 +88,14 @@ type ConstraintViolation struct {
 
 // Context contains useful information for a Constraint, including the value(s) being validated.
 type Context struct {
-	PathKind    PathKind
-	StrictTypes bool // Enables panicking if the wrong type is passed to a constraint
-	StructTag   string
-	Values      []Value
+	PathKind  PathKind
+	StructTag string
+	Values    []Value
 }
 
 // NewContext returns a new Context, with a Value created for the given interface{} value.
 func NewContext(value interface{}) Context {
-	ctx := Context{StrictTypes: true, StructTag: DefaultNameStructTag}
+	ctx := Context{StructTag: DefaultNameStructTag}
 	return ctx.WithValue("", reflect.ValueOf(value))
 }
 

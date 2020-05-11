@@ -9,7 +9,7 @@ import (
 // NoneOf ...
 func NoneOf(disallowed ...interface{}) validation.ConstraintFunc {
 	if len(disallowed) < 2 {
-		panic("constraint: NoneOf must be given at least 2 disallowed values")
+		panic("constraints: NoneOf must be given at least 2 disallowed values")
 	}
 
 	return func(ctx validation.Context) []validation.ConstraintViolation {

@@ -35,16 +35,6 @@ func TestLength(t *testing.T) {
 		}, violations[0].Details)
 	})
 
-	t.Run("should not panic if given values of any type 'len' can be called on", func(t *testing.T) {
-		assert.NotPanics(t, func() {
-			Length(1)(validation.NewContext([1]int{1}))
-			Length(1)(validation.NewContext(make(chan struct{})))
-			Length(1)(validation.NewContext(map[string]interface{}{}))
-			Length(1)(validation.NewContext([]string{}))
-			Length(1)(validation.NewContext(""))
-		})
-	})
-
 	t.Run("should not panic if given a nil pointer to a type 'len' can be called on", func(t *testing.T) {
 		assert.NotPanics(t, func() {
 			Length(1)(validation.NewContext((*chan struct{})(nil)))
@@ -54,14 +44,8 @@ func TestLength(t *testing.T) {
 		})
 	})
 
-	t.Run("should panic if given a value of the wrong type, even if it's empty", func(t *testing.T) {
-		assert.Panics(t, func() { Length(1)(validation.NewContext(123)) })
-		assert.Panics(t, func() { Length(1)(validation.NewContext(0)) })
-	})
-
-	t.Run("should return violations if given a value of the wrong type, even if it's empty, if strict types is false", func(t *testing.T) {
+	t.Run("should return violations if given a value of the wrong type, and if the value is not empty", func(t *testing.T) {
 		ctx := validation.NewContext(123)
-		ctx.StrictTypes = false
 
 		assert.Len(t, Length(1)(ctx), 1)
 	})

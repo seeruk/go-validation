@@ -10,6 +10,10 @@ import (
 func Max(max float64) validation.ConstraintFunc {
 	return func(ctx validation.Context) []validation.ConstraintViolation {
 		rval := validation.UnwrapValue(ctx.Value().Node)
+		if validation.IsEmpty(rval) {
+			return nil
+		}
+
 		rtyp := validation.UnwrapType(rval.Type())
 
 		allowed := []reflect.Kind{
@@ -18,18 +22,10 @@ func Max(max float64) validation.ConstraintFunc {
 			reflect.Float32, reflect.Float64,
 		}
 
-		// Value must be able to be passed to 'len'.
-		if ctx.StrictTypes {
-			validation.MustBe(rtyp, allowed...)
-		} else {
-			violations := validation.ShouldBe(ctx, rtyp, allowed...)
-			if len(violations) > 0 {
-				return violations
-			}
-		}
-
-		if validation.IsEmpty(rval) {
-			return nil
+		// Value should be able to have the > operator used on it.
+		violations := validation.ShouldBe(ctx, rtyp, allowed...)
+		if len(violations) > 0 {
+			return violations
 		}
 
 		var actual float64
