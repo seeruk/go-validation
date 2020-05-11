@@ -32,8 +32,6 @@ func TimeBefore(before time.Time) validation.ConstraintFunc {
 					}),
 				}
 			}
-		default:
-			panic("constraints: value given to TimeBefore must be a time.Time (or pointer to)")
 		}
 
 		return nil

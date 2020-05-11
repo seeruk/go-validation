@@ -32,8 +32,6 @@ func TimeAfter(after time.Time) validation.ConstraintFunc {
 					}),
 				}
 			}
-		default:
-			panic("constraints: value given to TimeAfter must be a time.Time (or pointer to)")
 		}
 
 		return nil
