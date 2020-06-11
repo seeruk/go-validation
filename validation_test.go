@@ -9,7 +9,7 @@ import (
 
 	"github.com/seeruk/go-validation"
 	"github.com/seeruk/go-validation/constraints"
-	"github.com/seeruk/go-validation/proto"
+	"github.com/seeruk/go-validation/protobuf"
 	"github.com/seeruk/go-validation/validationpb"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -352,10 +352,10 @@ func TestConstraintViolationsToProto(t *testing.T) {
 		protoViolations := validation.ConstraintViolationsToProto(violations)
 
 		require.Len(t, protoViolations, 1)
-		assert.Equal(t, path, protoViolations[0].Path)
-		assert.Equal(t, validationpb.PathKind(pathKind), protoViolations[0].PathKind)
-		assert.Equal(t, message, protoViolations[0].Message)
-		assert.Equal(t, proto.MapToStruct(details), protoViolations[0].Details)
+		assert.Equal(t, path, protoViolations[0].(*validationpb.ConstraintViolation).Path)
+		assert.Equal(t, validationpb.PathKind(pathKind), protoViolations[0].(*validationpb.ConstraintViolation).PathKind)
+		assert.Equal(t, message, protoViolations[0].(*validationpb.ConstraintViolation).Message)
+		assert.Equal(t, protobuf.MapToStruct(details), protoViolations[0].(*validationpb.ConstraintViolation).Details)
 	})
 }
 

@@ -6,7 +6,8 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/seeruk/go-validation/proto"
+	"github.com/golang/protobuf/proto"
+	"github.com/seeruk/go-validation/protobuf"
 	"github.com/seeruk/go-validation/validationpb"
 )
 
@@ -266,17 +267,20 @@ func UnwrapValue(val reflect.Value) reflect.Value {
 // ConstraintViolationsToProto converts a slice of ConstraintViolations into a slice of the ProtoBuf
 // representation of those ConstraintViolations, making them ready to use for example in a gRPC
 // service in a similar way to how ConstraintViolation can already be used in JSON web services.
-func ConstraintViolationsToProto(violations []ConstraintViolation) []validationpb.ConstraintViolation {
-	protoViolations := make([]validationpb.ConstraintViolation, 0, len(violations))
+//
+// They're returned as a slice of proto.Message so that they can be passed straight into something
+// like a gRPC status without transformation.
+func ConstraintViolationsToProto(violations []ConstraintViolation) []proto.Message {
+	protoViolations := make([]proto.Message, 0, len(violations))
 
 	for _, violation := range violations {
-		protoViolation := validationpb.ConstraintViolation{
+		protoViolation := &validationpb.ConstraintViolation{
 			Path: violation.Path,
 			// Currently these enum values are both just numbers, and both start at the same number,
 			// and the values are in the same order.
 			PathKind: validationpb.PathKind(violation.PathKind),
 			Message:  violation.Message,
-			Details:  proto.MapToStruct(violation.Details),
+			Details:  protobuf.MapToStruct(violation.Details),
 		}
 
 		protoViolations = append(protoViolations, protoViolation)
