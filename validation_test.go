@@ -13,6 +13,7 @@ import (
 	"github.com/seeruk/go-validation/validationpb"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/grpc/codes"
 )
 
 func TestValidate(t *testing.T) {
@@ -356,6 +357,50 @@ func TestConstraintViolationsToProto(t *testing.T) {
 		assert.Equal(t, validationpb.PathKind(pathKind), protoViolations[0].(*validationpb.ConstraintViolation).PathKind)
 		assert.Equal(t, message, protoViolations[0].(*validationpb.ConstraintViolation).Message)
 		assert.Equal(t, protobuf.MapToStruct(details), protoViolations[0].(*validationpb.ConstraintViolation).Details)
+	})
+}
+
+func TestViolationsToStatus(t *testing.T) {
+	violations := []validation.ConstraintViolation{
+		{
+			Path:     ".foo",
+			PathKind: validation.PathKindValue,
+			Message:  "test violation 1",
+		},
+		{
+			Path:     ".bar",
+			PathKind: validation.PathKindValue,
+			Message:  "test violation 2",
+			Details: map[string]interface{}{
+				"hello": "world",
+			},
+		},
+	}
+
+	t.Run("should return a status with a clear message", func(t *testing.T) {
+		status := validation.ViolationsToStatus(violations)
+		assert.Equal(t, "validation failed", status.Message())
+	})
+
+	t.Run("should return a status with an appropriate code", func(t *testing.T) {
+		status := validation.ViolationsToStatus(violations)
+		assert.Equal(t, codes.InvalidArgument, status.Code())
+	})
+
+	t.Run("should return a status with the violations attached (as proto messages)", func(t *testing.T) {
+		status := validation.ViolationsToStatus(violations)
+		details := status.Details()
+
+		assert.Len(t, details, 2)
+
+		for i, detail := range details {
+			violation := detail.(*validationpb.ConstraintViolation)
+
+			assert.Equal(t, violations[i].Path, violation.Path)
+			assert.Equal(t, validationpb.PathKind(violations[i].PathKind), violation.PathKind)
+			assert.Equal(t, violations[i].Message, violation.Message)
+			assert.Equal(t, protobuf.MapToStruct(violations[i].Details), violation.Details)
+		}
 	})
 }
 

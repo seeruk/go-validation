@@ -9,6 +9,8 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/seeruk/go-validation/protobuf"
 	"github.com/seeruk/go-validation/validationpb"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // DefaultNameStructTag is the default struct tag used to override the name of struct fields in the
@@ -274,17 +276,27 @@ func ConstraintViolationsToProto(violations []ConstraintViolation) []proto.Messa
 	protoViolations := make([]proto.Message, 0, len(violations))
 
 	for _, violation := range violations {
-		protoViolation := &validationpb.ConstraintViolation{
+		protoViolations = append(protoViolations, &validationpb.ConstraintViolation{
 			Path: violation.Path,
 			// Currently these enum values are both just numbers, and both start at the same number,
 			// and the values are in the same order.
 			PathKind: validationpb.PathKind(violation.PathKind),
 			Message:  violation.Message,
 			Details:  protobuf.MapToStruct(violation.Details),
-		}
-
-		protoViolations = append(protoViolations, protoViolation)
+		})
 	}
 
 	return protoViolations
+}
+
+// ViolationsToStatus returns the given set of constraint violations as a gRPC status.
+func ViolationsToStatus(violations []ConstraintViolation) *status.Status {
+	sts, err := status.New(codes.InvalidArgument, "validation failed").
+		WithDetails(ConstraintViolationsToProto(violations)...)
+
+	if err != nil {
+		return status.New(codes.Internal, "failed to generate status for validation failures")
+	}
+
+	return sts
 }
