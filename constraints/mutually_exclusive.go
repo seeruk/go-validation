@@ -7,6 +7,7 @@ import (
 )
 
 // MutuallyExclusive ...
+// TODO: Support maps.
 func MutuallyExclusive(fields ...string) validation.ConstraintFunc {
 	return func(ctx validation.Context) []validation.ConstraintViolation {
 		rval := validation.UnwrapValue(ctx.Value().Node)
