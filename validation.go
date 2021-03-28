@@ -133,10 +133,10 @@ func (c *Context) Violation(message string, details map[string]interface{}) Cons
 	// The first is skipped because if validation.Validate was used it won't have a name, we'll just
 	// refer to it as ".".
 	for i, val := range c.Values[1:] {
-		pathBuilder.WriteString(val.Name)
-		if val.Name != "" && i < len(c.Values[1:])-1 {
+		if val.Name != "" && i != 0 {
 			pathBuilder.WriteString(".")
 		}
+		pathBuilder.WriteString(val.Name)
 	}
 
 	return ConstraintViolation{
