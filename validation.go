@@ -192,13 +192,12 @@ func FieldName(ctx Context, fieldName string) string {
 
 	if ctx.StructTag != "" {
 		tag := field.Tag.Get(ctx.StructTag)
-		switch tag {
-		case "":
+		if tag == "-" {
+			name = ""
+		} else if tag != "" {
 			// Split should never return an empty slice as long as the separator is not empty.
 			split := strings.Split(tag, ",")
 			name = split[0]
-		case "-":
-			name = ""
 		}
 	}
 
