@@ -134,7 +134,7 @@ func (c *Context) Violation(message string, details map[string]interface{}) Cons
 	// refer to it as ".".
 	for i, val := range c.Values[1:] {
 		pathBuilder.WriteString(val.Name)
-		if i < len(c.Values[1:])-1 {
+		if val.Name != "" && i < len(c.Values[1:])-1 {
 			pathBuilder.WriteString(".")
 		}
 	}
@@ -191,11 +191,14 @@ func FieldName(ctx Context, fieldName string) string {
 	name := fieldName
 
 	if ctx.StructTag != "" {
-		tag := field.Tag.Get(ctx.StructTag)
-		if tag != "" {
+		tag := field.Tag.Get(ctx.StructTag)\
+		switch tag {
+		case "":
 			// Split should never return an empty slice as long as the separator is not empty.
 			split := strings.Split(tag, ",")
 			name = split[0]
+		case "-":
+			name = ""
 		}
 	}
 
