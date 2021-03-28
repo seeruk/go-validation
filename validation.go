@@ -17,10 +17,6 @@ import (
 // path that's output.
 const DefaultNameStructTag = "validation"
 
-// FallbackNameStructTag is the default fallback struct tag used to override the name of struct
-// fields in the path that's output.
-const FallbackNameStructTag = "json"
-
 // Validate executes the given constraint(s) against the given value, returning any violations of
 // those constraints.
 func Validate(value interface{}, constraints ...Constraint) []ConstraintViolation {
@@ -95,15 +91,14 @@ type ConstraintViolation struct {
 
 // Context contains useful information for a Constraint, including the value(s) being validated.
 type Context struct {
-	PathKind    PathKind
-	StructTag   string
-	FallbackTag string
-	Values      []Value
+	PathKind  PathKind
+	StructTag string
+	Values    []Value
 }
 
 // NewContext returns a new Context, with a Value created for the given interface{} value.
 func NewContext(value interface{}) Context {
-	ctx := Context{StructTag: DefaultNameStructTag, FallbackTag: FallbackNameStructTag}
+	ctx := Context{StructTag: DefaultNameStructTag}
 	return ctx.WithValue("", reflect.ValueOf(value))
 }
 
@@ -183,33 +178,16 @@ func FieldName(ctx Context, fieldName string) string {
 
 	name := fieldName
 
-	// Try main struct tag (default "validation").
-	if tagName := getFieldNameByTag(ctx.StructTag, field); tagName != "" {
-		name = tagName
-	}
-
-	// Try fallback struct tag (default "json")
-	if tagName := getFieldNameByTag(ctx.FallbackTag, field); tagName != "" {
-		name = tagName
+	if ctx.StructTag != "" {
+		tag := field.Tag.Get(ctx.StructTag)
+		if tag != "" {
+			// Split should never return an empty slice as long as the separator is not empty.
+			split := strings.Split(tag, ",")
+			name = split[0]
+		}
 	}
 
 	return name
-}
-
-// getFieldNameByTag ...
-func getFieldNameByTag(tag string, field reflect.StructField) string {
-	if tag == "" {
-		return ""
-	}
-
-	contents := field.Tag.Get(tag)
-	if contents != "" {
-		// Split should never return an empty slice as long as the separator is not empty.
-		split := strings.Split(contents, ",")
-		return split[0]
-	}
-
-	return ""
 }
 
 // MustBe will panic if the given reflect.Value is not one of the given reflect.Kind kinds.
