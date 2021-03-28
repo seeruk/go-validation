@@ -2,6 +2,7 @@ package validation
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"reflect"
 	"strings"
@@ -77,6 +78,25 @@ type PathKind int
 func (k PathKind) MarshalJSON() ([]byte, error) {
 	// TODO: Be less lazy, more performant.
 	return json.Marshal(k.String())
+}
+
+// UnmarshalJSON takes the given bytes and attempts to mutate this PathKind to the appropriate
+// value, if a valid value is given.
+func (k *PathKind) UnmarshalJSON(bs []byte) error {
+	if len(bs) < 2 || bs[0] != '"' || bs[len(bs)-1] != '"' {
+		return errors.New("expected TypeFieldKind value to start and end with double-quotes")
+	}
+
+	switch string(bs[1 : len(bs)-1]) {
+	case "value":
+		*k = PathKindValue
+	case "key":
+		*k = PathKindKey
+	default:
+		return errors.New("invalid PathKind")
+	}
+
+	return nil
 }
 
 // String returns the string representation of this PathKind.
