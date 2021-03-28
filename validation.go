@@ -27,7 +27,7 @@ func Validate(value interface{}, constraints ...Constraint) []ConstraintViolatio
 // option(s), allowing them to avoid manually creating a context and using the simpler API while
 // maintaining the ability to customise the validation context.
 // TODO: Any more options to add?
-func CreateValidateFn(structTag string) func(value interface{}, constraints ...Constraint) []ConstraintViolation {
+func CreateValidateFunc(structTag string) func(value interface{}, constraints ...Constraint) []ConstraintViolation {
 	return func(value interface{}, constraints ...Constraint) []ConstraintViolation {
 		ctx := NewContext(value)
 		ctx.StructTag = structTag
