@@ -23,6 +23,18 @@ func Validate(value interface{}, constraints ...Constraint) []ConstraintViolatio
 	return ValidateContext(NewContext(value), constraints...)
 }
 
+// CreateValidateFn allows the caller to create a customised validate function, using the given
+// option(s), allowing them to avoid manually creating a context and using the simpler API while
+// maintaining the ability to customise the validation context.
+// TODO: Any more options to add?
+func CreateValidateFn(structTag string) func(value interface{}, constraints ...Constraint) []ConstraintViolation {
+	return func(value interface{}, constraints ...Constraint) []ConstraintViolation {
+		ctx := NewContext(value)
+		ctx.StructTag = structTag
+		return ValidateContext(ctx, constraints...)
+	}
+}
+
 // ValidateContext is exactly like Validate, except it doesn't create a Context for you. This allows
 // for more granular configuration provided by the Context type (and means we can avoid creating a
 // Validator struct type to do this).
