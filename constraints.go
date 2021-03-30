@@ -3,6 +3,7 @@ package validation
 import (
 	"fmt"
 	"reflect"
+	"sort"
 )
 
 // Constraints is simply a collection of many constraints. All of the constraints will be run, and
@@ -15,6 +16,10 @@ func (cc Constraints) Violations(ctx Context) []ConstraintViolation {
 	for _, c := range cc {
 		violations = append(violations, c.Violations(ctx)...)
 	}
+
+	sort.Slice(violations, func(i, j int) bool {
+		return violations[i].Path < violations[j].Path
+	})
 
 	return violations
 }

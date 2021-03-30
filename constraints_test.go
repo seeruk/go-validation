@@ -32,6 +32,24 @@ func TestConstraints(t *testing.T) {
 
 		assert.Len(t, violations, 4)
 	})
+
+	t.Run("should sort the returned violations by path", func(t *testing.T) {
+		subject := TestSubject{
+			Text:   "abc",
+			Number: 123,
+		}
+
+		for i := 0; i < 10000; i++ {
+			violations := Validate(subject, Fields{
+				"Text":   &TestConstraint{},
+				"Number": &TestConstraint{},
+			})
+
+			require.Len(t, violations, 2)
+			require.Equal(t, ".number", violations[0].Path)
+			require.Equal(t, ".text", violations[1].Path)
+		}
+	})
 }
 
 func TestElements(t *testing.T) {
@@ -851,7 +869,8 @@ func TestWhenFn(t *testing.T) {
 }
 
 type TestSubject struct {
-	Text string `validation:"text"`
+	Text   string `validation:"text"`
+	Number int    `validation:"number"`
 }
 
 type TestConstraint struct {
