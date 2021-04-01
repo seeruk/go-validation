@@ -32,15 +32,15 @@ func (e Elements) Violations(ctx Context) []ConstraintViolation {
 	rval := UnwrapValue(ctx.Value().Node)
 	rtyp := UnwrapType(rval.Type())
 
+	if rval.IsZero() {
+		return nil
+	}
+
 	allowed := []reflect.Kind{reflect.Array, reflect.Map, reflect.Slice}
 
 	violations := ShouldBe(ctx, rtyp, allowed...)
 	if len(violations) > 0 {
 		return violations
-	}
-
-	if rval.IsZero() {
-		return nil
 	}
 
 	if rval.Len() == 0 {
@@ -77,13 +77,13 @@ func (f Fields) Violations(ctx Context) []ConstraintViolation {
 	rval := UnwrapValue(ctx.Value().Node)
 	rtyp := UnwrapType(rval.Type())
 
+	if IsNillable(rval) && rval.IsNil() {
+		return nil
+	}
+
 	violations := ShouldBe(ctx, rtyp, reflect.Struct)
 	if len(violations) > 0 {
 		return violations
-	}
-
-	if IsNillable(rval) && rval.IsNil() {
-		return nil
 	}
 
 	for fieldName, constraint := range f {
@@ -102,13 +102,13 @@ func (k Keys) Violations(ctx Context) []ConstraintViolation {
 	rval := UnwrapValue(ctx.Value().Node)
 	rtyp := UnwrapType(rval.Type())
 
+	if rval.IsZero() {
+		return nil
+	}
+
 	violations := ShouldBe(ctx, rtyp, reflect.Map)
 	if len(violations) > 0 {
 		return violations
-	}
-
-	if rval.IsNil() {
-		return nil
 	}
 
 	if rval.Len() == 0 {
@@ -212,13 +212,13 @@ func (m Map) Violations(ctx Context) []ConstraintViolation {
 	rval := UnwrapValue(ctx.Value().Node)
 	rtyp := UnwrapType(rval.Type())
 
+	if rval.IsZero() {
+		return nil
+	}
+
 	violations := ShouldBe(ctx, rtyp, reflect.Map)
 	if len(violations) > 0 {
 		return violations
-	}
-
-	if rval.IsNil() { // Maps, or pointers to maps can be nil.
-		return nil
 	}
 
 	for mapKey, constraint := range m {
