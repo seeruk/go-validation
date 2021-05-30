@@ -549,16 +549,6 @@ func TestLazy(t *testing.T) {
 		assert.Equal(t, 1, testConstraint.Calls)
 		assert.Len(t, violations, 1)
 	})
-
-	t.Run("should return violations if the given type is not allowed, and the value is not empty", func(t *testing.T) {
-		vctx := NewContext("hello world")
-
-		testConstraint := &TestConstraint{}
-
-		violations := ValidateContext(vctx, Lazy(func() Constraint { return testConstraint }))
-
-		assert.Len(t, violations, 1)
-	})
 }
 
 func TestLazyDynamic(t *testing.T) {
@@ -874,12 +864,17 @@ type TestSubject struct {
 }
 
 type TestConstraint struct {
-	Calls int
+	Calls       int
+	NoViolation bool
 }
 
 func (c *TestConstraint) Violations(ctx Context) []ConstraintViolation {
 	c.Calls++
-	return []ConstraintViolation{
-		ctx.Violation("test violations", nil),
+
+	var violations []ConstraintViolation
+	if !c.NoViolation {
+		violations = append(violations, ctx.Violation("test violations", nil))
 	}
+
+	return violations
 }
