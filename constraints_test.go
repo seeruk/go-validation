@@ -549,6 +549,17 @@ func TestLazy(t *testing.T) {
 		assert.Equal(t, 1, testConstraint.Calls)
 		assert.Len(t, violations, 1)
 	})
+
+	t.Run("should support non-struct values", func(t *testing.T) {
+		testConstraint := &TestConstraint{
+			NoViolation: true,
+		}
+
+		violations := Validate("hello world", Lazy(func() Constraint { return testConstraint }))
+
+		assert.Equal(t, 1, testConstraint.Calls)
+		assert.Len(t, violations, 0)
+	})
 }
 
 func TestLazyDynamic(t *testing.T) {
