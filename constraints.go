@@ -131,14 +131,6 @@ type Lazy func() Constraint
 
 // Violations ...
 func (f Lazy) Violations(ctx Context) []ConstraintViolation {
-	rval := UnwrapValue(ctx.Value().Node)
-	rtyp := UnwrapType(rval.Type())
-
-	violations := ShouldBe(ctx, rtyp, reflect.Struct)
-	if len(violations) > 0 {
-		return violations
-	}
-
 	return f().Violations(ctx)
 }
 
