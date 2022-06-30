@@ -24,7 +24,7 @@ func Validate(value interface{}, constraints ...Constraint) []ConstraintViolatio
 	return ValidateContext(NewContext(value), constraints...)
 }
 
-// CreateValidateFn allows the caller to create a customised validate function, using the given
+// CreateValidateFunc allows the caller to create a customised validate function, using the given
 // option(s), allowing them to avoid manually creating a context and using the simpler API while
 // maintaining the ability to customise the validation context.
 // TODO: Any more options to add?
@@ -57,7 +57,7 @@ type Constraint interface {
 // struct, keeping code more compact.
 type ConstraintFunc func(ctx Context) []ConstraintViolation
 
-// Validate ...
+// Violations ...
 func (c ConstraintFunc) Violations(ctx Context) []ConstraintViolation {
 	return c(ctx)
 }
