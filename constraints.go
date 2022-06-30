@@ -30,11 +30,11 @@ type Elements []Constraint
 // Violations ...
 func (e Elements) Violations(ctx Context) []ConstraintViolation {
 	rval := UnwrapValue(ctx.Value().Node)
-	rtyp := UnwrapType(rval.Type())
-
-	if rval.IsZero() {
+	if !rval.IsValid() || rval.IsZero() {
 		return nil
 	}
+
+	rtyp := UnwrapType(rval.Type())
 
 	allowed := []reflect.Kind{reflect.Array, reflect.Map, reflect.Slice}
 
