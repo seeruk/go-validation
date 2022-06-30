@@ -215,9 +215,6 @@ func (m Map) Violations(ctx Context) []ConstraintViolation {
 
 	for mapKey, constraint := range m {
 		value := rval.MapIndex(reflect.ValueOf(mapKey))
-		if IsEmpty(value) {
-			continue
-		}
 
 		ctx := ctx.WithValue(
 			valueString(reflect.ValueOf(mapKey)),

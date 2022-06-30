@@ -767,6 +767,16 @@ func TestMap(t *testing.T) {
 
 		assert.Len(t, violations, 1)
 	})
+
+	t.Run("should run constraints on empty fields", func(t *testing.T) {
+		constraint := Map{
+			"foo": &TestConstraint{},
+		}
+
+		violations := Validate(map[string]interface{}{}, constraint)
+
+		assert.Len(t, violations, 1)
+	})
 }
 
 func TestWhen(t *testing.T) {
