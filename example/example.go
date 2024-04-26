@@ -34,6 +34,7 @@ type Example struct {
 	Nested2   *Example                   `json:"nested2" validation:"nested2"`
 	Nesteds   []*NestedExample           `json:"nesteds"`
 	NestedMap map[NestedExample]struct{} `json:"nested_map" validation:"nested_map"`
+	Details   string                     `json:"details" validation:"details"`
 }
 
 func exampleConstraints(e Example) validation.Constraint {
@@ -106,6 +107,10 @@ func exampleConstraints(e Example) validation.Constraint {
 			"NestedMap": validation.Keys{
 				nestedExampleConstraints(),
 			},
+			"Details": constraints.Details(constraints.Regexp(patternGreeting), "should start with 'Hello'",
+				"key1", "value1",
+				"key2", 2,
+			),
 		},
 
 		validation.When(
