@@ -26,6 +26,7 @@ func main() {
 	example.Times = []time.Time{
 		time.Date(2020, time.January, 1, 0, 0, 0, 0, time.UTC),
 	}
+	example.Details = "Doesn't start with 'Hello'"
 
 	example.Nested2 = &Example{}
 
