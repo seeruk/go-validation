@@ -55,4 +55,16 @@ func TestNoneOf(t *testing.T) {
 			NoneOf("test")(validation.NewContext("test"))
 		})
 	})
+
+	t.Run("should work with wrapped/pointer values", func(t *testing.T) {
+		val := "foo"
+		violations := NoneOf("foo", "bar")(validation.NewContext(&val))
+		assert.Len(t, violations, 1)
+		assert.Equal(t, map[string]interface{}{
+			"disallowed": []interface{}{
+				"foo",
+				"bar",
+			},
+		}, violations[0].Details)
+	})
 }

@@ -20,7 +20,7 @@ func OneOf(allowed ...interface{}) validation.ConstraintFunc {
 
 		var found bool
 		for _, a := range allowed {
-			if reflect.DeepEqual(ctx.Value().Node.Interface(), a) {
+			if reflect.DeepEqual(rval.Interface(), a) {
 				found = true
 				break
 			}
