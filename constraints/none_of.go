@@ -20,7 +20,7 @@ func NoneOf(disallowed ...interface{}) validation.ConstraintFunc {
 
 		var found bool
 		for _, a := range disallowed {
-			if reflect.DeepEqual(ctx.Value().Node.Interface(), a) {
+			if reflect.DeepEqual(rval.Interface(), a) {
 				found = true
 				break
 			}
