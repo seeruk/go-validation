@@ -55,4 +55,10 @@ func TestOneOf(t *testing.T) {
 			OneOf("test")(validation.NewContext("test"))
 		})
 	})
+
+	t.Run("should work with wrapped/pointer values", func(t *testing.T) {
+		val := "foo"
+		violations := OneOf("foo", "bar")(validation.NewContext(&val))
+		require.Len(t, violations, 0)
+	})
 }
