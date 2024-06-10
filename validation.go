@@ -11,7 +11,7 @@ import (
 	"github.com/seeruk/go-validation/validationpb"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/protoadapt"
 )
 
 // DefaultNameStructTag is the default struct tag used to override the name of struct fields in the
@@ -306,8 +306,8 @@ func UnwrapValue(val reflect.Value) reflect.Value {
 //
 // They're returned as a slice of proto.Message so that they can be passed straight into something
 // like a gRPC status without transformation.
-func ConstraintViolationsToProto(violations []ConstraintViolation) []proto.Message {
-	protoViolations := make([]proto.Message, 0, len(violations))
+func ConstraintViolationsToProto(violations []ConstraintViolation) []protoadapt.MessageV1 {
+	protoViolations := make([]protoadapt.MessageV1, 0, len(violations))
 
 	for _, violation := range violations {
 		protoViolations = append(protoViolations, &validationpb.ConstraintViolation{
