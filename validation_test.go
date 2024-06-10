@@ -14,6 +14,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 func TestValidate(t *testing.T) {
@@ -404,6 +406,49 @@ func TestViolationsToStatus(t *testing.T) {
 	})
 }
 
+func TestViolationsFromStatus(t *testing.T) {
+	t.Run("should return the same violations that were used to create the status", func(t *testing.T) {
+		input := []validation.ConstraintViolation{
+			{
+				Path:     ".foo",
+				PathKind: validation.PathKindValue,
+				Message:  "test violation 1",
+			},
+			{
+				Path:     ".bar",
+				PathKind: validation.PathKindValue,
+				Message:  "test violation 2",
+				Details: map[string]interface{}{
+					"hello": "world",
+				},
+			},
+		}
+
+		status := validation.ViolationsToStatus(input)
+		output := validation.ViolationsFromStatus(status)
+		assert.Equal(t, input, output)
+	})
+
+	t.Run("should return an empty slice if the status has no details", func(t *testing.T) {
+		status := status.New(codes.InvalidArgument, "validation failed")
+		output := validation.ViolationsFromStatus(status)
+		assert.Empty(t, output)
+	})
+
+	t.Run("should ignore details that aren't ConstraintViolation messages", func(t *testing.T) {
+		status, err := status.New(codes.Internal, "something went wrong").
+			WithDetails(&structpb.Struct{
+				Fields: map[string]*structpb.Value{
+					"hello": structpb.NewStringValue("world"),
+				},
+			})
+		require.NoError(t, err)
+
+		output := validation.ViolationsFromStatus(status)
+		assert.Empty(t, output)
+	})
+}
+
 // Benchmarking ...
 
 // patternGreeting is a regular expression to test that a string starts with "Hello".
@@ -544,7 +589,7 @@ func BenchmarkValidateHappy(b *testing.B) {
 	cc := ts.Constraints()
 
 	ctx := validation.NewContext(ts)
-	//ctx.StructTag = ""
+	// ctx.StructTag = ""
 
 	b.ReportAllocs()
 	b.ResetTimer()

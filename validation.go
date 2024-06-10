@@ -334,3 +334,32 @@ func ViolationsToStatus(violations []ConstraintViolation) *status.Status {
 
 	return sts
 }
+
+// ViolationsFromStatus returns the constraint violations from the given gRPC status. If the status
+// doesn't contain any constraint violations, an empty slice is returned.
+func ViolationsFromStatus(sts *status.Status) []ConstraintViolation {
+	details := sts.Details()
+	violations := make([]ConstraintViolation, 0, len(details))
+	for _, detail := range details {
+		violation, ok := detail.(*validationpb.ConstraintViolation)
+		if !ok {
+			continue
+		}
+
+		// violation.Details.AsMap doesn't do a nil check, so we'll do it here. This avoids
+		// an unnecessary allocation.
+		var violationDetails map[string]interface{}
+		if violation.Details != nil {
+			violationDetails = violation.Details.AsMap()
+		}
+
+		violations = append(violations, ConstraintViolation{
+			Path:     violation.Path,
+			PathKind: PathKind(violation.PathKind),
+			Message:  violation.Message,
+			Details:  violationDetails,
+		})
+	}
+
+	return violations
+}
