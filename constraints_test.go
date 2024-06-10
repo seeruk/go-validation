@@ -148,7 +148,6 @@ func TestElements(t *testing.T) {
 
 			assert.Equal(t, 0, testConstraint.Calls)
 			assert.Len(t, violations, 0)
-
 		})
 	})
 
@@ -177,7 +176,6 @@ func TestElements(t *testing.T) {
 
 			assert.Equal(t, 0, testConstraint.Calls)
 			assert.Len(t, violations, 0)
-
 		})
 	})
 

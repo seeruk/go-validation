@@ -327,7 +327,6 @@ func ConstraintViolationsToProto(violations []ConstraintViolation) []proto.Messa
 func ViolationsToStatus(violations []ConstraintViolation) *status.Status {
 	sts, err := status.New(codes.InvalidArgument, "validation failed").
 		WithDetails(ConstraintViolationsToProto(violations)...)
-
 	if err != nil {
 		return status.New(codes.Internal, "failed to generate status for validation failures")
 	}
