@@ -7,11 +7,11 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/golang/protobuf/proto"
 	"github.com/seeruk/go-validation/protobuf"
 	"github.com/seeruk/go-validation/validationpb"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/proto"
 )
 
 // DefaultNameStructTag is the default struct tag used to override the name of struct fields in the

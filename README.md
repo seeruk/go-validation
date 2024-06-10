@@ -2,6 +2,16 @@
 
 Simple and flexible Go (Golang) validation library.
 
-## TODO
+This library provides an elegant DSL for defining validation constraints in Go.
 
-* Add documentation to constraints.
+## Installation
+
+Pull in the library using `go get`:
+
+```sh
+$ go get github.com/seeruk/go-validation
+```
+
+## License
+
+MIT
