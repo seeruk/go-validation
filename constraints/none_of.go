@@ -7,7 +7,7 @@ import (
 )
 
 // NoneOf ...
-func NoneOf(disallowed ...interface{}) validation.ConstraintFunc {
+func NoneOf(disallowed ...any) validation.ConstraintFunc {
 	if len(disallowed) < 2 {
 		panic("constraints: NoneOf must be given at least 2 disallowed values")
 	}
@@ -28,7 +28,7 @@ func NoneOf(disallowed ...interface{}) validation.ConstraintFunc {
 
 		if found {
 			return []validation.ConstraintViolation{
-				ctx.Violation("value must not be one of the disallowed values", map[string]interface{}{
+				ctx.Violation("value must not be one of the disallowed values", map[string]any{
 					"disallowed": disallowed,
 				}),
 			}

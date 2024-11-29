@@ -9,24 +9,12 @@ import (
 
 // TimeAfter ...
 func TimeAfter(after time.Time) validation.ConstraintFunc {
-	return func(ctx validation.Context) []validation.ConstraintViolation {
-		rval := validation.UnwrapValue(ctx.Value().Node)
-		if validation.IsEmpty(rval) {
-			return nil
-		}
-
-		rtyp := validation.UnwrapType(rval.Type())
-
-		violations := validation.ShouldBe(ctx, rtyp, reflect.Struct)
-		if len(violations) > 0 {
-			return violations
-		}
-
+	return ValueFunc(func(ctx validation.Context, rval reflect.Value) []validation.ConstraintViolation {
 		switch v := rval.Interface().(type) {
 		case time.Time:
 			if !v.After(after) {
 				return []validation.ConstraintViolation{
-					ctx.Violation("value must be after time", map[string]interface{}{
+					ctx.Violation("value must be after time", map[string]any{
 						// TODO: after_time and actual_time?
 						"time": after.Format(time.RFC3339),
 					}),
@@ -35,5 +23,5 @@ func TimeAfter(after time.Time) validation.ConstraintFunc {
 		}
 
 		return nil
-	}
+	}, reflect.Struct)
 }

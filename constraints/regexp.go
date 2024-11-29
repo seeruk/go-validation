@@ -9,22 +9,10 @@ import (
 
 // Regexp ...
 func Regexp(pattern *regexp.Regexp) validation.ConstraintFunc {
-	return func(ctx validation.Context) []validation.ConstraintViolation {
-		rval := validation.UnwrapValue(ctx.Value().Node)
-		if validation.IsEmpty(rval) {
-			return nil
-		}
-
-		rtyp := validation.UnwrapType(rval.Type())
-
-		violations := validation.ShouldBe(ctx, rtyp, reflect.String)
-		if len(violations) > 0 {
-			return violations
-		}
-
+	return ValueFunc(func(ctx validation.Context, rval reflect.Value) []validation.ConstraintViolation {
 		if !pattern.MatchString(rval.String()) {
 			return []validation.ConstraintViolation{
-				ctx.Violation("value must match regular expression", map[string]interface{}{
+				ctx.Violation("value must match regular expression", map[string]any{
 					// TODO: Include actual value?
 					"regexp": pattern.String(),
 				}),
@@ -32,5 +20,5 @@ func Regexp(pattern *regexp.Regexp) validation.ConstraintFunc {
 		}
 
 		return nil
-	}
+	}, reflect.String)
 }

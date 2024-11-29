@@ -127,7 +127,7 @@ func TestElements(t *testing.T) {
 		// NOTE: An array cannot be nil, and must have the length specified by it's type.
 
 		t.Run("against a map", func(t *testing.T) {
-			var m map[string]interface{}
+			var m map[string]any
 
 			testConstraint := &TestConstraint{}
 			violations := Validate(m, Elements{
@@ -155,7 +155,7 @@ func TestElements(t *testing.T) {
 		// NOTE: An array cannot be nil, and must have the length specified by it's type.
 
 		t.Run("against a map", func(t *testing.T) {
-			m := make(map[string]interface{}, 0)
+			m := make(map[string]any, 0)
 
 			testConstraint := &TestConstraint{}
 			violations := Validate(m, Elements{
@@ -405,7 +405,7 @@ func TestFields(t *testing.T) {
 func TestKeys(t *testing.T) {
 	t.Run("should run all constraints", func(t *testing.T) {
 		testConstraint := &TestConstraint{}
-		mapTester := map[string]interface{}{
+		mapTester := map[string]any{
 			"Foo": "Hello",
 			"Bar": 123,
 			"Baz": []string{"Hello", "World"},
@@ -420,7 +420,7 @@ func TestKeys(t *testing.T) {
 
 	t.Run("should return all constraint violations", func(t *testing.T) {
 		testConstraint := &TestConstraint{}
-		mapTester := map[string]interface{}{
+		mapTester := map[string]any{
 			"Foo": "Hello",
 			"Bar": 123,
 			"Baz": []string{"Hello", "World"},
@@ -436,7 +436,7 @@ func TestKeys(t *testing.T) {
 	t.Run("should return no violations if the given value is nil", func(t *testing.T) {
 		testConstraint := &TestConstraint{}
 
-		violations := Validate((map[string]interface{})(nil), Keys{
+		violations := Validate((map[string]any)(nil), Keys{
 			testConstraint,
 			testConstraint,
 			testConstraint,
@@ -445,7 +445,7 @@ func TestKeys(t *testing.T) {
 		assert.Len(t, violations, 0)
 
 		// Pointers to map are also possible.
-		violations = Validate((*map[string]interface{})(nil), Keys{
+		violations = Validate((*map[string]any)(nil), Keys{
 			testConstraint,
 			testConstraint,
 			testConstraint,
@@ -457,7 +457,7 @@ func TestKeys(t *testing.T) {
 	t.Run("should return no violations if the given map is empty (but not nil)", func(t *testing.T) {
 		testConstraint := &TestConstraint{}
 
-		violations := Validate(map[string]interface{}{}, Keys{
+		violations := Validate(map[string]any{}, Keys{
 			testConstraint,
 			testConstraint,
 			testConstraint,
@@ -467,7 +467,7 @@ func TestKeys(t *testing.T) {
 	})
 
 	t.Run("should update the context's value node to the fields of the given value", func(t *testing.T) {
-		mapTester := map[string]interface{}{
+		mapTester := map[string]any{
 			"Foo": "Hello",
 			"Bar": 123,
 			"Baz": []string{"Hello", "World"},
@@ -491,7 +491,7 @@ func TestKeys(t *testing.T) {
 
 	t.Run("should update the path", func(t *testing.T) {
 		testConstraint := &TestConstraint{}
-		mapTester := map[string]interface{}{
+		mapTester := map[string]any{
 			"Foo": "Hello",
 		}
 
@@ -505,7 +505,7 @@ func TestKeys(t *testing.T) {
 
 	t.Run("should update the path, even with a nil key", func(t *testing.T) {
 		testConstraint := &TestConstraint{}
-		mapTester := map[*string]interface{}{
+		mapTester := map[*string]any{
 			nil: "Hello",
 		}
 
@@ -655,7 +655,7 @@ func TestLazyDynamic(t *testing.T) {
 func TestMap(t *testing.T) {
 	t.Run("should run all constraints", func(t *testing.T) {
 		testConstraint := &TestConstraint{}
-		mapTester := map[string]interface{}{
+		mapTester := map[string]any{
 			"Foo": "Hello",
 			"Bar": 123,
 			"Baz": []string{"Hello", "World"},
@@ -672,7 +672,7 @@ func TestMap(t *testing.T) {
 
 	t.Run("should return all constraint violations", func(t *testing.T) {
 		testConstraint := &TestConstraint{}
-		mapTester := map[string]interface{}{
+		mapTester := map[string]any{
 			"Foo": "Hello",
 			"Bar": 123,
 			"Baz": []string{"Hello", "World"},
@@ -690,7 +690,7 @@ func TestMap(t *testing.T) {
 	t.Run("should return no violations if the given value is nil", func(t *testing.T) {
 		testConstraint := &TestConstraint{}
 
-		violations := Validate((map[string]interface{})(nil), Map{
+		violations := Validate((map[string]any)(nil), Map{
 			"Foo": testConstraint,
 			"Bar": testConstraint,
 			"Baz": testConstraint,
@@ -699,7 +699,7 @@ func TestMap(t *testing.T) {
 		assert.Len(t, violations, 0)
 
 		// Pointers to map are also possible.
-		violations = Validate((*map[string]interface{})(nil), Map{
+		violations = Validate((*map[string]any)(nil), Map{
 			"Foo": testConstraint,
 			"Bar": testConstraint,
 			"Baz": testConstraint,

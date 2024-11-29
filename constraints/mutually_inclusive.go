@@ -9,24 +9,12 @@ import (
 // MutuallyInclusive ...
 // TODO: Support maps.
 func MutuallyInclusive(fields ...string) validation.ConstraintFunc {
-	return func(ctx validation.Context) []validation.ConstraintViolation {
-		rval := validation.UnwrapValue(ctx.Value().Node)
-		if validation.IsEmpty(rval) {
-			return nil
-		}
-
-		rtyp := validation.UnwrapType(rval.Type())
-
-		violations := validation.ShouldBe(ctx, rtyp, reflect.Struct)
-		if len(violations) > 0 {
-			return violations
-		}
-
+	return ValueFunc(func(ctx validation.Context, rval reflect.Value) []validation.ConstraintViolation {
 		fieldNames := make([]string, 0, len(fields))
 
 		var nonEmpty []string
 		for _, field := range fields {
-			// We need to get all of the aliased field names, not the fields arg.
+			// We need to get all aliased field names, not the fields arg.
 			fieldName := validation.FieldName(ctx, field)
 			fieldNames = append(fieldNames, fieldName)
 
@@ -38,12 +26,12 @@ func MutuallyInclusive(fields ...string) validation.ConstraintFunc {
 
 		if len(nonEmpty) > 1 && len(nonEmpty) != len(fields) {
 			return []validation.ConstraintViolation{
-				ctx.Violation("fields are mutually inclusive", map[string]interface{}{
+				ctx.Violation("fields are mutually inclusive", map[string]any{
 					"fields": fieldNames,
 				}),
 			}
 		}
 
 		return nil
-	}
+	}, reflect.Struct)
 }

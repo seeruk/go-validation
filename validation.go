@@ -20,7 +20,7 @@ const DefaultNameStructTag = "validation"
 
 // Validate executes the given constraint(s) against the given value, returning any violations of
 // those constraints.
-func Validate(value interface{}, constraints ...Constraint) []ConstraintViolation {
+func Validate(value any, constraints ...Constraint) []ConstraintViolation {
 	return ValidateContext(NewContext(value), constraints...)
 }
 
@@ -28,8 +28,8 @@ func Validate(value interface{}, constraints ...Constraint) []ConstraintViolatio
 // option(s), allowing them to avoid manually creating a context and using the simpler API while
 // maintaining the ability to customise the validation context.
 // TODO: Any more options to add?
-func CreateValidateFunc(structTag string) func(value interface{}, constraints ...Constraint) []ConstraintViolation {
-	return func(value interface{}, constraints ...Constraint) []ConstraintViolation {
+func CreateValidateFunc(structTag string) func(value any, constraints ...Constraint) []ConstraintViolation {
+	return func(value any, constraints ...Constraint) []ConstraintViolation {
 		ctx := NewContext(value)
 		ctx.StructTag = structTag
 		return ValidateContext(ctx, constraints...)
@@ -115,10 +115,10 @@ func (k PathKind) String() string {
 // of a Constraint. It contains information to find the value that is failing, and how to resolve
 // the violation.
 type ConstraintViolation struct {
-	Path     string                 `json:"path"`
-	PathKind PathKind               `json:"path_kind"`
-	Message  string                 `json:"message"`
-	Details  map[string]interface{} `json:"details,omitempty"`
+	Path     string         `json:"path"`
+	PathKind PathKind       `json:"path_kind"`
+	Message  string         `json:"message"`
+	Details  map[string]any `json:"details,omitempty"`
 }
 
 // Context contains useful information for a Constraint, including the value(s) being validated.
@@ -128,8 +128,8 @@ type Context struct {
 	Values    []Value
 }
 
-// NewContext returns a new Context, with a Value created for the given interface{} value.
-func NewContext(value interface{}) Context {
+// NewContext returns a new Context, with a Value created for the given any value.
+func NewContext(value any) Context {
 	ctx := Context{StructTag: DefaultNameStructTag}
 	return ctx.WithValue("", reflect.ValueOf(value))
 }
@@ -146,7 +146,7 @@ func (c *Context) Value() Value {
 // Violation provides a convenient way to produce a ConstraintViolation using the information found
 // on the Context. If a custom violation is needed, one can always be made using the information on
 // the Context manually.
-func (c *Context) Violation(message string, details map[string]interface{}) ConstraintViolation {
+func (c *Context) Violation(message string, details map[string]any) ConstraintViolation {
 	pathBuilder := strings.Builder{}
 	pathBuilder.WriteString(".")
 
@@ -267,7 +267,7 @@ func ShouldBe(ctx Context, typ reflect.Type, kinds ...reflect.Kind) []Constraint
 	}
 
 	return []ConstraintViolation{
-		ctx.Violation("value should be of one of the allowed kinds", map[string]interface{}{
+		ctx.Violation("value should be of one of the allowed kinds", map[string]any{
 			"allowed_kinds": kindNames,
 		}),
 	}
@@ -347,7 +347,7 @@ func ViolationsFromStatus(sts *status.Status) []ConstraintViolation {
 
 		// violation.Details.AsMap doesn't do a nil check, so we'll do it here. This avoids
 		// an unnecessary allocation.
-		var violationDetails map[string]interface{}
+		var violationDetails map[string]any
 		if violation.Details != nil {
 			violationDetails = violation.Details.AsMap()
 		}

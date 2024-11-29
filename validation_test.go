@@ -131,7 +131,7 @@ func TestContext_Value(t *testing.T) {
 func TestContext_Violation(t *testing.T) {
 	t.Run("should return a new violation with the given message and details", func(t *testing.T) {
 		message := "test violation"
-		details := map[string]interface{}{
+		details := map[string]any{
 			"some": "value",
 		}
 
@@ -338,12 +338,12 @@ func TestConstraintViolationsToProto(t *testing.T) {
 		path := ".test.violation.[0].to.proto"
 		pathKind := validation.PathKindKey
 		message := "test violation"
-		details := map[string]interface{}{
+		details := map[string]any{
 			"bool":   true,
 			"int":    123,
 			"float":  123.456,
 			"string": "Hello, World!",
-			"nested": map[string]interface{}{
+			"nested": map[string]any{
 				"string": "nested string",
 			},
 		}
@@ -373,7 +373,7 @@ func TestViolationsToStatus(t *testing.T) {
 			Path:     ".bar",
 			PathKind: validation.PathKindValue,
 			Message:  "test violation 2",
-			Details: map[string]interface{}{
+			Details: map[string]any{
 				"hello": "world",
 			},
 		},
@@ -418,7 +418,7 @@ func TestViolationsFromStatus(t *testing.T) {
 				Path:     ".bar",
 				PathKind: validation.PathKindValue,
 				Message:  "test violation 2",
-				Details: map[string]interface{}{
+				Details: map[string]any{
 					"hello": "world",
 				},
 			},

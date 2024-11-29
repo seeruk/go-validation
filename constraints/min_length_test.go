@@ -29,7 +29,7 @@ func TestMinLength(t *testing.T) {
 	t.Run("should return details about the minimum length with a violation", func(t *testing.T) {
 		violations := MinLength(2)(validation.NewContext([]string{"test"}))
 		require.Len(t, violations, 1)
-		assert.Equal(t, map[string]interface{}{
+		assert.Equal(t, map[string]any{
 			"actual":  1,
 			"minimum": 2,
 		}, violations[0].Details)
@@ -39,7 +39,7 @@ func TestMinLength(t *testing.T) {
 		assert.NotPanics(t, func() {
 			MinLength(1)(validation.NewContext([1]int{1}))
 			MinLength(1)(validation.NewContext(make(chan struct{})))
-			MinLength(1)(validation.NewContext(map[string]interface{}{}))
+			MinLength(1)(validation.NewContext(map[string]any{}))
 			MinLength(1)(validation.NewContext([]string{}))
 			MinLength(1)(validation.NewContext(""))
 		})

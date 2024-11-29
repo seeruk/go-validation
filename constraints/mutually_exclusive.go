@@ -9,19 +9,7 @@ import (
 // MutuallyExclusive ...
 // TODO: Support maps.
 func MutuallyExclusive(fields ...string) validation.ConstraintFunc {
-	return func(ctx validation.Context) []validation.ConstraintViolation {
-		rval := validation.UnwrapValue(ctx.Value().Node)
-		if validation.IsEmpty(rval) {
-			return nil
-		}
-
-		rtyp := validation.UnwrapType(rval.Type())
-
-		violations := validation.ShouldBe(ctx, rtyp, reflect.Struct)
-		if len(violations) > 0 {
-			return violations
-		}
-
+	return ValueFunc(func(ctx validation.Context, rval reflect.Value) []validation.ConstraintViolation {
 		var nonEmpty []string
 		for _, field := range fields {
 			f := rval.FieldByName(field)
@@ -32,12 +20,12 @@ func MutuallyExclusive(fields ...string) validation.ConstraintFunc {
 
 		if len(nonEmpty) > 1 {
 			return []validation.ConstraintViolation{
-				ctx.Violation("fields are mutually exclusive", map[string]interface{}{
+				ctx.Violation("fields are mutually exclusive", map[string]any{
 					"fields": nonEmpty,
 				}),
 			}
 		}
 
 		return nil
-	}
+	}, reflect.Struct)
 }

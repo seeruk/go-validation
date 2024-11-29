@@ -136,7 +136,7 @@ func (f Lazy) Violations(ctx Context) []ConstraintViolation {
 
 // LazyDynamic is a Constraint that's extremely similar to Lazy, and fulfils mostly the same
 // purpose, but instead expects a function that has a single argument of the type being validated.
-func LazyDynamic(constraintFn interface{}) Constraint {
+func LazyDynamic(constraintFn any) Constraint {
 	// TODO: Check constraintFn is not nil?
 	return &lazyDynamic{
 		constraintFn: constraintFn,
@@ -145,7 +145,7 @@ func LazyDynamic(constraintFn interface{}) Constraint {
 
 // lazyDynamic is the implementation of the LazyDynamic constraint.
 type lazyDynamic struct {
-	constraintFn interface{}
+	constraintFn any
 }
 
 // constraintType is kept on it's own here because it won't change, we don't need to fetch it every
@@ -197,7 +197,7 @@ func (ld *lazyDynamic) Violations(ctx Context) []ConstraintViolation {
 // Map is a Constraint used to validate a map. This Constraint validates the values in the map, by
 // specific keys. If you want to use the same validation on all keys of a map, use Elements instead.
 // If you want to validate the keys of the map, use Keys instead.
-type Map map[interface{}]Constraint
+type Map map[any]Constraint
 
 // Violations ...
 func (m Map) Violations(ctx Context) []ConstraintViolation {

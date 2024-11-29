@@ -33,8 +33,8 @@ func TestOneOf(t *testing.T) {
 	t.Run("should return details about the allowed values with a violation", func(t *testing.T) {
 		violations := OneOf("foo", "bar")(validation.NewContext([]string{"test"}))
 		require.Len(t, violations, 1)
-		assert.Equal(t, map[string]interface{}{
-			"allowed": []interface{}{
+		assert.Equal(t, map[string]any{
+			"allowed": []any{
 				"foo",
 				"bar",
 			},

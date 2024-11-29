@@ -33,7 +33,7 @@ func TestTimeBefore(t *testing.T) {
 	t.Run("should return details about the time the value should be after with a violation", func(t *testing.T) {
 		violations := TimeBefore(past)(validation.NewContext(present))
 		require.Len(t, violations, 1)
-		assert.Equal(t, map[string]interface{}{
+		assert.Equal(t, map[string]any{
 			"time": past.Format(time.RFC3339),
 		}, violations[0].Details)
 	})

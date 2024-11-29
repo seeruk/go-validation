@@ -33,8 +33,8 @@ func TestNoneOf(t *testing.T) {
 	t.Run("should return details about the allowed values with a violation", func(t *testing.T) {
 		violations := NoneOf("foo", "bar")(validation.NewContext("foo"))
 		require.Len(t, violations, 1)
-		assert.Equal(t, map[string]interface{}{
-			"disallowed": []interface{}{
+		assert.Equal(t, map[string]any{
+			"disallowed": []any{
 				"foo",
 				"bar",
 			},
@@ -60,8 +60,8 @@ func TestNoneOf(t *testing.T) {
 		val := "foo"
 		violations := NoneOf("foo", "bar")(validation.NewContext(&val))
 		assert.Len(t, violations, 1)
-		assert.Equal(t, map[string]interface{}{
-			"disallowed": []interface{}{
+		assert.Equal(t, map[string]any{
+			"disallowed": []any{
 				"foo",
 				"bar",
 			},

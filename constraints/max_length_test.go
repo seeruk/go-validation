@@ -29,7 +29,7 @@ func TestMaxLength(t *testing.T) {
 	t.Run("should return details about the maximum length with a violation", func(t *testing.T) {
 		violations := MaxLength(1)(validation.NewContext([]string{"foo", "bar"}))
 		require.Len(t, violations, 1)
-		assert.Equal(t, map[string]interface{}{
+		assert.Equal(t, map[string]any{
 			"actual":  2,
 			"maximum": 1,
 		}, violations[0].Details)

@@ -17,32 +17,20 @@ func AtLeastNRequired(n int, fields ...string) validation.ConstraintFunc {
 	if n >= len(fields) {
 		// - If n < len(fields) that's fine, e.g. at least 2 of 4 fields must be set.
 		// - If n == len(fields) that's not fine, e.g. at least 3 of 3 fields must be set, doesn't
-		//   make sense because you'd just be saying that all of the given fields are required. You
-		//   should just use the Required constraint on all of the fields instead then.
+		//   make sense because you'd just be saying that all given fields are required. You should
+		//   just use the Required constraint on all fields instead then.
 		// - If n > len(fields) that's not fine, e.g. at least 4 of 2 fields must be set, makes no
 		//   sense, because you'd never be able to satisfy that requirement, and the constraint
 		//   would always return a violation.
 		panic("constraints: value of n given to AtLeastNRequired must be less than the number of fields")
 	}
 
-	return func(ctx validation.Context) []validation.ConstraintViolation {
-		rval := validation.UnwrapValue(ctx.Value().Node)
-		if validation.IsEmpty(rval) {
-			return nil
-		}
-
-		rtyp := validation.UnwrapType(rval.Type())
-
-		violations := validation.ShouldBe(ctx, rtyp, reflect.Struct)
-		if len(violations) > 0 {
-			return violations
-		}
-
+	return ValueFunc(func(ctx validation.Context, rval reflect.Value) []validation.ConstraintViolation {
 		fieldNames := make([]string, 0, len(fields))
 
 		var nonEmpty []string
 		for _, field := range fields {
-			// We need to get all of the aliased field names, not the fields arg.
+			// We need to get all aliased field names, not the fields arg.
 			fieldName := validation.FieldName(ctx, field)
 			fieldNames = append(fieldNames, fieldName)
 
@@ -54,7 +42,7 @@ func AtLeastNRequired(n int, fields ...string) validation.ConstraintFunc {
 
 		if len(nonEmpty) < n {
 			return []validation.ConstraintViolation{
-				ctx.Violation("minimum number of required fields not met", map[string]interface{}{
+				ctx.Violation("minimum number of required fields not met", map[string]any{
 					"actual":  len(nonEmpty),
 					"minimum": n,
 					"fields":  fieldNames,
@@ -63,5 +51,5 @@ func AtLeastNRequired(n int, fields ...string) validation.ConstraintFunc {
 		}
 
 		return nil
-	}
+	}, reflect.Struct)
 }

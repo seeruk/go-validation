@@ -12,7 +12,7 @@ import (
 
 func TestMapToStruct(t *testing.T) {
 	t.Run("should return nil if an empty map is given", func(t *testing.T) {
-		assert.Empty(t, MapToStruct(map[string]interface{}{}))
+		assert.Empty(t, MapToStruct(map[string]any{}))
 	})
 
 	t.Run("should be able to handle all expected types", func(t *testing.T) {
@@ -23,18 +23,18 @@ func TestMapToStruct(t *testing.T) {
 
 		assertMapOfSupportedTypes(t, input, output)
 
-		require.IsType(t, map[string]interface{}{}, input["nested"])
+		require.IsType(t, map[string]any{}, input["nested"])
 		require.IsType(t, &structpb.Value_StructValue{}, output.Fields["nested"].Kind)
 
 		// Well, this is gross.
 		assertMapOfSupportedTypes(t,
-			input["nested"].(map[string]interface{}),
+			input["nested"].(map[string]any),
 			output.Fields["nested"].Kind.(*structpb.Value_StructValue).StructValue,
 		)
 	})
 }
 
-func assertMapOfSupportedTypes(t *testing.T, input map[string]interface{}, output *structpb.Struct) {
+func assertMapOfSupportedTypes(t *testing.T, input map[string]any, output *structpb.Struct) {
 	// nil
 	assert.IsType(t, &structpb.Value_NullValue{}, output.Fields["nil"].Kind)
 	assert.Equal(t, output.Fields["nil"], &structpb.Value{Kind: &structpb.Value_NullValue{
@@ -139,8 +139,8 @@ func assertMapOfSupportedTypes(t *testing.T, input map[string]interface{}, outpu
 	}})
 }
 
-func mapOfSupportedTypes() map[string]interface{} {
-	return map[string]interface{}{
+func mapOfSupportedTypes() map[string]any {
+	return map[string]any{
 		"nil":         nil,
 		"bool":        true,
 		"int":         123,

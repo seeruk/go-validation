@@ -31,7 +31,7 @@ func TestMax(t *testing.T) {
 	t.Run("should return details about the maximum value with a violation", func(t *testing.T) {
 		violations := Max(1)(validation.NewContext(123))
 		require.Len(t, violations, 1)
-		assert.Equal(t, map[string]interface{}{
+		assert.Equal(t, map[string]any{
 			"actual":  float64(123),
 			"maximum": float64(1),
 		}, violations[0].Details)

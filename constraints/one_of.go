@@ -7,7 +7,7 @@ import (
 )
 
 // OneOf ...
-func OneOf(allowed ...interface{}) validation.ConstraintFunc {
+func OneOf(allowed ...any) validation.ConstraintFunc {
 	if len(allowed) < 2 {
 		panic("constraints: OneOf must be given at least 2 allowed values")
 	}
@@ -28,7 +28,7 @@ func OneOf(allowed ...interface{}) validation.ConstraintFunc {
 
 		if !found {
 			return []validation.ConstraintViolation{
-				ctx.Violation("value must be one of the allowed values", map[string]interface{}{
+				ctx.Violation("value must be one of the allowed values", map[string]any{
 					"allowed": allowed,
 				}),
 			}

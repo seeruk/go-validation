@@ -14,7 +14,7 @@ var raw = []byte(`{
 }`)
 
 func main() {
-	var input map[string]interface{}
+	var input map[string]any
 
 	err := json.Unmarshal(raw, &input)
 	if err != nil {

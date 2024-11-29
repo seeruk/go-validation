@@ -7,7 +7,7 @@ import (
 )
 
 // NotEquals ...
-func NotEquals(value interface{}) validation.ConstraintFunc {
+func NotEquals(value any) validation.ConstraintFunc {
 	return func(ctx validation.Context) []validation.ConstraintViolation {
 		rval := validation.UnwrapValue(ctx.Value().Node)
 		if validation.IsEmpty(rval) {
@@ -17,7 +17,7 @@ func NotEquals(value interface{}) validation.ConstraintFunc {
 		if reflect.DeepEqual(rval.Interface(), value) {
 			return []validation.ConstraintViolation{
 				// TODO: Better message wording...
-				ctx.Violation("value must not equal expected value", map[string]interface{}{
+				ctx.Violation("value must not equal expected value", map[string]any{
 					"expected": value,
 				}),
 			}

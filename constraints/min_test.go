@@ -31,7 +31,7 @@ func TestMin(t *testing.T) {
 	t.Run("should return details about the minimum value with a violation", func(t *testing.T) {
 		violations := Min(math.MaxFloat64)(validation.NewContext(123))
 		require.Len(t, violations, 1)
-		assert.Equal(t, map[string]interface{}{
+		assert.Equal(t, map[string]any{
 			"minimum": math.MaxFloat64,
 		}, violations[0].Details)
 	})

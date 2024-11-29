@@ -33,7 +33,7 @@ func TestEquals(t *testing.T) {
 	t.Run("should return details about the expected value with a violation", func(t *testing.T) {
 		violations := Equals("test")(validation.NewContext("not test"))
 		require.Len(t, violations, 1)
-		assert.Equal(t, map[string]interface{}{
+		assert.Equal(t, map[string]any{
 			"expected": "test",
 		}, violations[0].Details)
 	})

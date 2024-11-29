@@ -6,9 +6,9 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 )
 
-// MapToStruct converts a map of string to interface{} (e.g. a JSON object) to a ProtoBuf 'Struct'
+// MapToStruct converts a map of string to any (e.g. a JSON object) to a ProtoBuf 'Struct'
 // type, ready to be consumed by things like gRPC services.
-func MapToStruct(in map[string]interface{}) *structpb.Struct {
+func MapToStruct(in map[string]any) *structpb.Struct {
 	inLen := len(in)
 	if inLen == 0 {
 		return nil
@@ -23,7 +23,7 @@ func MapToStruct(in map[string]interface{}) *structpb.Struct {
 }
 
 // toValue converts a Go value to a ProtoBuf 'Value', if possible.
-func toValue(v interface{}) *structpb.Value {
+func toValue(v any) *structpb.Value {
 	switch v := v.(type) {
 	case nil:
 		return &structpb.Value{
@@ -121,7 +121,7 @@ func toValue(v interface{}) *structpb.Value {
 				StringValue: v.Error(),
 			},
 		}
-	case map[string]interface{}:
+	case map[string]any:
 		return &structpb.Value{
 			Kind: &structpb.Value_StructValue{
 				StructValue: MapToStruct(v),

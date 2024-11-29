@@ -46,7 +46,7 @@ func TestAtLeastNRequired(t *testing.T) {
 		violations := constraint(validation.NewContext(ts))
 
 		require.Len(t, violations, 1)
-		assert.Equal(t, map[string]interface{}{
+		assert.Equal(t, map[string]any{
 			"actual":  1,
 			"minimum": 2,
 			"fields":  []string{"Field1", "Field2", "field3", "field4"},

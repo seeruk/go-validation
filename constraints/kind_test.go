@@ -27,7 +27,7 @@ func TestKind(t *testing.T) {
 	t.Run("should return details about the allowed kinds", func(t *testing.T) {
 		violations := Kind(reflect.Struct)(validation.NewContext(123))
 		require.Len(t, violations, 1)
-		assert.Equal(t, map[string]interface{}{
+		assert.Equal(t, map[string]any{
 			"allowed_kinds": []string{
 				"struct",
 			},

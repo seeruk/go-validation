@@ -29,7 +29,7 @@ func TestLength(t *testing.T) {
 	t.Run("should return details about the expected length with a violation", func(t *testing.T) {
 		violations := Length(1)(validation.NewContext([]string{"hello", "world"}))
 		require.Len(t, violations, 1)
-		assert.Equal(t, map[string]interface{}{
+		assert.Equal(t, map[string]any{
 			"actual":   2,
 			"expected": 1,
 		}, violations[0].Details)

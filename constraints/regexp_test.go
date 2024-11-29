@@ -32,7 +32,7 @@ func TestRegexp(t *testing.T) {
 	t.Run("should return details about the pattern with a violation", func(t *testing.T) {
 		violations := Regexp(pattern)(validation.NewContext("test"))
 		require.Len(t, violations, 1)
-		assert.Equal(t, map[string]interface{}{
+		assert.Equal(t, map[string]any{
 			"regexp": "^Hello, ",
 		}, violations[0].Details)
 	})

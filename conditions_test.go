@@ -48,7 +48,7 @@ func TestIsNillable(t *testing.T) {
 	t.Run("should return true for nillable types", func(t *testing.T) {
 		assert.True(t, IsNillable(reflect.ValueOf((chan struct{})(nil))))
 		assert.True(t, IsNillable(reflect.ValueOf((func())(nil))))
-		assert.True(t, IsNillable(reflect.ValueOf((map[string]interface{})(nil))))
+		assert.True(t, IsNillable(reflect.ValueOf((map[string]any)(nil))))
 		assert.True(t, IsNillable(reflect.ValueOf((*string)(nil))))
 		assert.True(t, IsNillable(reflect.ValueOf(([]string)(nil))))
 		assert.True(t, IsNillable(reflect.ValueOf((unsafe.Pointer)(nil))))
