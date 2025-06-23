@@ -7,7 +7,7 @@ import (
 )
 
 // OneOf ...
-func OneOf(allowed ...any) validation.ConstraintFunc {
+func OneOf[T any](allowed ...T) validation.ConstraintFunc {
 	if len(allowed) < 2 {
 		panic("constraints: OneOf must be given at least 2 allowed values")
 	}

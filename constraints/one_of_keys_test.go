@@ -10,7 +10,7 @@ import (
 
 func TestOneOfKeys(t *testing.T) {
 	t.Run("should return no violations if the key is one of the allowed keys", func(t *testing.T) {
-		violations := OneOfKeys("foo", 12, true)(validation.NewContext(map[any]any{
+		violations := OneOfKeys[any]("foo", 12, true)(validation.NewContext(map[any]any{
 			"foo": "bar",
 			12:    34,
 			true:  false,
@@ -20,13 +20,13 @@ func TestOneOfKeys(t *testing.T) {
 	})
 
 	t.Run("should return a violations if a key isn't one of the allowed keys", func(t *testing.T) {
-		violations := OneOfKeys("foo", 12, true)(validation.NewContext(map[any]any{
+		violations := OneOfKeys[any]("foo", 12, true)(validation.NewContext(map[any]any{
 			false: true,
 		}))
 
 		assert.Len(t, violations, 1)
 
-		violations = OneOfKeys("foo", 12, true)(validation.NewContext(map[any]any{
+		violations = OneOfKeys[any]("foo", 12, true)(validation.NewContext(map[any]any{
 			"bar": "foo",
 			34:    12,
 			false: true,
@@ -37,19 +37,19 @@ func TestOneOfKeys(t *testing.T) {
 	})
 
 	t.Run("should not return any violations if the map is empty", func(t *testing.T) {
-		violations := OneOfKeys("foo", 12, true)(validation.NewContext(map[any]any{}))
+		violations := OneOfKeys[any]("foo", 12, true)(validation.NewContext(map[any]any{}))
 		assert.Len(t, violations, 0)
 	})
 
 	t.Run("should not panic if given a nil map", func(t *testing.T) {
 		assert.NotPanics(t, func() {
-			OneOfKeys("hello", "world")(validation.NewContext((map[any]any)(nil)))
+			OneOfKeys[any]("hello", "world")(validation.NewContext((map[any]any)(nil)))
 		})
 	})
 
 	t.Run("should panic if given no allowed keys", func(t *testing.T) {
 		assert.Panics(t, func() {
-			OneOfKeys()(validation.NewContext(map[any]interface{}{}))
+			OneOfKeys[any]()(validation.NewContext(map[any]interface{}{}))
 		})
 	})
 }

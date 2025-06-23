@@ -8,7 +8,7 @@ import (
 )
 
 // OneOfKeys ...
-func OneOfKeys(keys ...any) validation.ConstraintFunc {
+func OneOfKeys[T any](keys ...T) validation.ConstraintFunc {
 	if len(keys) < 1 {
 		panic("constraints: OneOfKeys must be given at least 1 allowed value")
 	}

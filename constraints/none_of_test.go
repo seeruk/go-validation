@@ -34,7 +34,7 @@ func TestNoneOf(t *testing.T) {
 		violations := NoneOf("foo", "bar")(validation.NewContext("foo"))
 		require.Len(t, violations, 1)
 		assert.Equal(t, map[string]any{
-			"disallowed": []any{
+			"disallowed": []string{
 				"foo",
 				"bar",
 			},
@@ -61,7 +61,7 @@ func TestNoneOf(t *testing.T) {
 		violations := NoneOf("foo", "bar")(validation.NewContext(&val))
 		assert.Len(t, violations, 1)
 		assert.Equal(t, map[string]any{
-			"disallowed": []any{
+			"disallowed": []string{
 				"foo",
 				"bar",
 			},

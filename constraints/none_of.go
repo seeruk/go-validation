@@ -7,7 +7,7 @@ import (
 )
 
 // NoneOf ...
-func NoneOf(disallowed ...any) validation.ConstraintFunc {
+func NoneOf[T any](disallowed ...T) validation.ConstraintFunc {
 	if len(disallowed) < 2 {
 		panic("constraints: NoneOf must be given at least 2 disallowed values")
 	}
