@@ -14,6 +14,11 @@ message ConstraintViolation {
     google.protobuf.Struct details = 4;
 }
 
+// ConstraintViolations is a ProtoBuf representation of multiple ConstraintViolation values.
+message ConstraintViolations {
+    repeated ConstraintViolation violations = 1;
+}
+
 // PathKind is a ProtoBuf representation of the PathKind type, enumerating the different possible
 // path kinds (i.e. denoting what the constraint violation is referring to at the given path).
 enum PathKind {

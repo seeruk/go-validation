@@ -331,7 +331,7 @@ func TestConstraintViolationsToProto(t *testing.T) {
 			{Path: ".test", Message: "violation 4"},
 		}
 
-		assert.Len(t, validation.ConstraintViolationsToProto(violations), len(violations))
+		assert.Len(t, validation.ConstraintViolationsToProto(violations).Violations, len(violations))
 	})
 
 	t.Run("should return the same information in resulting proto violations", func(t *testing.T) {
@@ -354,11 +354,33 @@ func TestConstraintViolationsToProto(t *testing.T) {
 
 		protoViolations := validation.ConstraintViolationsToProto(violations)
 
-		require.Len(t, protoViolations, 1)
-		assert.Equal(t, path, protoViolations[0].(*validationpb.ConstraintViolation).Path)
-		assert.Equal(t, validationpb.PathKind(pathKind), protoViolations[0].(*validationpb.ConstraintViolation).PathKind)
-		assert.Equal(t, message, protoViolations[0].(*validationpb.ConstraintViolation).Message)
-		assert.Equal(t, protobuf.MapToStruct(details), protoViolations[0].(*validationpb.ConstraintViolation).Details)
+		require.Len(t, protoViolations.Violations, 1)
+		assert.Equal(t, path, protoViolations.Violations[0].Path)
+		assert.Equal(t, validationpb.PathKind(pathKind), protoViolations.Violations[0].PathKind)
+		assert.Equal(t, message, protoViolations.Violations[0].Message)
+		assert.Equal(t, protobuf.MapToStruct(details), protoViolations.Violations[0].Details)
+	})
+}
+
+func TestConstraintViolationsFromProto(t *testing.T) {
+	t.Run("should return nil for nil proto violations", func(t *testing.T) {
+		assert.Nil(t, validation.ConstraintViolationsFromProto(nil))
+	})
+
+	t.Run("should return the same information in resulting violations", func(t *testing.T) {
+		input := []validation.ConstraintViolation{
+			{
+				Path:     ".test",
+				PathKind: validation.PathKindKey,
+				Message:  "test violation",
+				Details: map[string]any{
+					"hello": "world",
+				},
+			},
+		}
+
+		output := validation.ConstraintViolationsFromProto(validation.ConstraintViolationsToProto(input))
+		assert.Equal(t, input, output)
 	})
 }
 
@@ -393,11 +415,12 @@ func TestViolationsToStatus(t *testing.T) {
 		status := validation.ViolationsToStatus(violations)
 		details := status.Details()
 
-		assert.Len(t, details, 2)
+		require.Len(t, details, 1)
 
-		for i, detail := range details {
-			violation := detail.(*validationpb.ConstraintViolation)
+		protoViolations := details[0].(*validationpb.ConstraintViolations)
+		require.Len(t, protoViolations.Violations, 2)
 
+		for i, violation := range protoViolations.Violations {
 			assert.Equal(t, violations[i].Path, violation.Path)
 			assert.Equal(t, validationpb.PathKind(violations[i].PathKind), violation.PathKind)
 			assert.Equal(t, violations[i].Message, violation.Message)
@@ -433,6 +456,32 @@ func TestViolationsFromStatus(t *testing.T) {
 		status := status.New(codes.InvalidArgument, "validation failed")
 		output := validation.ViolationsFromStatus(status)
 		assert.Empty(t, output)
+	})
+
+	t.Run("should return violations from legacy ConstraintViolation details", func(t *testing.T) {
+		input := []validation.ConstraintViolation{
+			{
+				Path:     ".foo",
+				PathKind: validation.PathKindValue,
+				Message:  "test violation 1",
+			},
+			{
+				Path:     ".bar",
+				PathKind: validation.PathKindKey,
+				Message:  "test violation 2",
+				Details: map[string]any{
+					"hello": "world",
+				},
+			},
+		}
+		protoViolations := validation.ConstraintViolationsToProto(input)
+
+		status, err := status.New(codes.InvalidArgument, "validation failed").
+			WithDetails(protoViolations.Violations[0], protoViolations.Violations[1])
+		require.NoError(t, err)
+
+		output := validation.ViolationsFromStatus(status)
+		assert.Equal(t, input, output)
 	})
 
 	t.Run("should ignore details that aren't ConstraintViolation messages", func(t *testing.T) {
