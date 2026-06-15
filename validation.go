@@ -11,7 +11,6 @@ import (
 	"github.com/seeruk/go-validation/validationpb"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/protoadapt"
 )
 
 // DefaultNameStructTag is the default struct tag used to override the name of struct fields in the
@@ -300,33 +299,74 @@ func UnwrapValue(val reflect.Value) reflect.Value {
 	return val
 }
 
-// ConstraintViolationsToProto converts a slice of ConstraintViolations into a slice of the ProtoBuf
-// representation of those ConstraintViolations, making them ready to use for example in a gRPC
-// service in a similar way to how ConstraintViolation can already be used in JSON web services.
-//
-// They're returned as a slice of proto.Message so that they can be passed straight into something
-// like a gRPC status without transformation.
-func ConstraintViolationsToProto(violations []ConstraintViolation) []protoadapt.MessageV1 {
-	protoViolations := make([]protoadapt.MessageV1, 0, len(violations))
-
+// ConstraintViolationsToProto converts a slice of ConstraintViolations into the ProtoBuf
+// representation of those ConstraintViolations.
+func ConstraintViolationsToProto(violations []ConstraintViolation) *validationpb.ConstraintViolations {
+	protoViolations := make([]*validationpb.ConstraintViolation, 0, len(violations))
 	for _, violation := range violations {
-		protoViolations = append(protoViolations, &validationpb.ConstraintViolation{
-			Path: violation.Path,
-			// Currently these enum values are both just numbers, and both start at the same number,
-			// and the values are in the same order.
-			PathKind: validationpb.PathKind(violation.PathKind),
-			Message:  violation.Message,
-			Details:  protobuf.MapToStruct(violation.Details),
-		})
+		protoViolations = append(protoViolations, ConstraintViolationToProto(violation))
 	}
 
-	return protoViolations
+	return &validationpb.ConstraintViolations{
+		Violations: protoViolations,
+	}
+}
+
+// ConstraintViolationsFromProto converts ProtoBuf ConstraintViolations into the native Go
+// representation.
+func ConstraintViolationsFromProto(protoViolations *validationpb.ConstraintViolations) []ConstraintViolation {
+	if protoViolations == nil {
+		return nil
+	}
+
+	violations := make([]ConstraintViolation, 0, len(protoViolations.Violations))
+	for _, protoViolation := range protoViolations.Violations {
+		if protoViolation == nil {
+			continue
+		}
+		violations = append(violations, ConstraintViolationFromProto(protoViolation))
+	}
+
+	return violations
+}
+
+// ConstraintViolationToProto converts a ConstraintViolation into the ProtoBuf representation of
+// that ConstraintViolation.
+func ConstraintViolationToProto(violation ConstraintViolation) *validationpb.ConstraintViolation {
+	return &validationpb.ConstraintViolation{
+		Path: violation.Path,
+		// Currently these enum values are both just numbers, and both start at the same number,
+		// and the values are in the same order.
+		PathKind: validationpb.PathKind(violation.PathKind),
+		Message:  violation.Message,
+		Details:  protobuf.MapToStruct(violation.Details),
+	}
+}
+
+// ConstraintViolationFromProto converts a ProtoBuf ConstraintViolation into the native Go
+// representation.
+func ConstraintViolationFromProto(protoViolation *validationpb.ConstraintViolation) ConstraintViolation {
+	if protoViolation == nil {
+		return ConstraintViolation{}
+	}
+
+	var details map[string]any
+	if protoViolation.Details != nil {
+		details = protoViolation.Details.AsMap()
+	}
+
+	return ConstraintViolation{
+		Path:     protoViolation.Path,
+		PathKind: PathKind(protoViolation.PathKind),
+		Message:  protoViolation.Message,
+		Details:  details,
+	}
 }
 
 // ViolationsToStatus returns the given set of constraint violations as a gRPC status.
 func ViolationsToStatus(violations []ConstraintViolation) *status.Status {
 	sts, err := status.New(codes.InvalidArgument, "validation failed").
-		WithDetails(ConstraintViolationsToProto(violations)...)
+		WithDetails(ConstraintViolationsToProto(violations))
 	if err != nil {
 		return status.New(codes.Internal, "failed to generate status for validation failures")
 	}
@@ -340,24 +380,12 @@ func ViolationsFromStatus(sts *status.Status) []ConstraintViolation {
 	details := sts.Details()
 	violations := make([]ConstraintViolation, 0, len(details))
 	for _, detail := range details {
-		violation, ok := detail.(*validationpb.ConstraintViolation)
-		if !ok {
-			continue
+		switch detail := detail.(type) {
+		case *validationpb.ConstraintViolations:
+			violations = append(violations, ConstraintViolationsFromProto(detail)...)
+		case *validationpb.ConstraintViolation:
+			violations = append(violations, ConstraintViolationFromProto(detail))
 		}
-
-		// violation.Details.AsMap doesn't do a nil check, so we'll do it here. This avoids
-		// an unnecessary allocation.
-		var violationDetails map[string]any
-		if violation.Details != nil {
-			violationDetails = violation.Details.AsMap()
-		}
-
-		violations = append(violations, ConstraintViolation{
-			Path:     violation.Path,
-			PathKind: PathKind(violation.PathKind),
-			Message:  violation.Message,
-			Details:  violationDetails,
-		})
 	}
 
 	return violations
