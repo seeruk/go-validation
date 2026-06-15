@@ -11,7 +11,6 @@ import (
 	"github.com/seeruk/go-validation/validationpb"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/protoadapt"
 )
 
 // DefaultNameStructTag is the default struct tag used to override the name of struct fields in the
@@ -367,7 +366,7 @@ func ConstraintViolationFromProto(protoViolation *validationpb.ConstraintViolati
 // ViolationsToStatus returns the given set of constraint violations as a gRPC status.
 func ViolationsToStatus(violations []ConstraintViolation) *status.Status {
 	sts, err := status.New(codes.InvalidArgument, "validation failed").
-		WithDetails(protoadapt.MessageV1Of(ConstraintViolationsToProto(violations)))
+		WithDetails(ConstraintViolationsToProto(violations))
 	if err != nil {
 		return status.New(codes.Internal, "failed to generate status for validation failures")
 	}
